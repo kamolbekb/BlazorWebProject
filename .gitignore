@@ -399,3 +399,4 @@ FodyWeavers.xsd
 # JetBrains Rider
 *.sln.iml
 ArizaApp/Server/Nafaqa.API/appsettings.Development.json
+ArizaApp/Server/Nafaqa.API/appsettings.Development.json

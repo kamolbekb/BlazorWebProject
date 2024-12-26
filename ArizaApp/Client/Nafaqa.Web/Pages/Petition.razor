@@ -1,0 +1,105 @@
+@page "/Petition"
+@using MudBlazor
+@using Nafaqa.Web.Services
+@inject PetitionService _petitionService
+
+<PageTitle>Petition</PageTitle>
+
+@* <MudTextField @bind-Value="petition.FullName" Label="Full Name" Variant="Variant.Outlined" *@
+@*               Margin="Margin.None"/> *@
+@* <MudTextField @bind-Value="petition.PassportSeria" Label="Passport Seria" Variant="Variant.Outlined" *@
+@*               Margin="Margin.Dense"/> *@
+@* <MudTextField @bind-Value="petition.PassportNumber" Label="Passport Number" Variant="Variant.Outlined" *@
+@*               Margin="Margin.Dense"/> *@
+@* <MudTextField @bind-Value="petition.Gender" Label="Gender" Variant="Variant.Outlined" *@
+@*               Margin="Margin.Dense"/> *@
+@* <MudTextField @bind-Value="petition.Address" Label="Address" Variant="Variant.Outlined" *@
+@*               Margin="Margin.Dense"/> *@
+@* <MudTextField @bind-Value="petition.PhoneNumber" Label="Phone Number" Variant="Variant.Outlined" *@
+@*               Margin="Margin.Dense"/> *@
+@* <MudTextField @bind-Value="petition.Allowance" Label="Allowance type" Variant="Variant.Outlined" *@
+@*               Margin="Margin.Dense"/> *@
+@* *@
+@* *@
+@* <div class="d-flex align-end justify-space-between mud-width-full"> *@
+@*     $1$ <div class="d-flex flex-column"> #1# *@
+@*     $1$     <MudText><b>Id:</b> @petition.Id</MudText> #1# *@
+@*     $1$ </div> #1# *@
+@*     <MudButton Variant="Variant.Filled" Disabled="@loading" OnClick="Insert">Insert Model</MudButton> *@
+@* </div> *@
+
+<EditForm Model="@petition" OnValidSubmit="Insert">
+    <DataAnnotationsValidator/>
+    <MudGrid>
+        <MudItem xs="12" sm="7">
+            <MudCard>
+                <MudCardContent>
+                    <MudTextField Label="Full name" 
+                                  @bind-Value="petition.FullName" For="@(() => petition.FullName)"/>
+                    <MudTextField Label="Passport Seria" Class="mt-3"
+                                  @bind-Value="petition.PassportSeria" For="@(() => petition.PassportSeria)"/>
+                    <MudTextField Label="Passport Number" Class="mt-3"
+                                  @bind-Value="petition.PassportNumber" For="@(() => petition.PassportNumber)"/>
+                    <MudTextField Label="Gender" Class="mt-3"
+                                  @bind-Value="petition.Gender" For="@(() => petition.Gender)"/>
+                    <MudTextField Label="Address" Class="mt-3"
+                                  @bind-Value="petition.Address" For="@(() => petition.Address)"/>
+                    <MudTextField Label="Phone Number" Class="mt-3"
+                                  @bind-Value="petition.PhoneNumber" For="@(() => petition.PhoneNumber)"/>
+                    <MudTextField Label="Allowance type" Class="mt-3"
+                                  @bind-Value="petition.Allowance" For="@(() => petition.Allowance)"/>
+                </MudCardContent>
+                <MudCardActions>
+                    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Register</MudButton>
+                </MudCardActions>
+            </MudCard>
+        </MudItem>
+        <MudItem xs="12" sm="5">
+            <MudPaper Class="pa-4 mud-height-full">
+                <MudText Typo="Typo.subtitle2">Validation Summary</MudText>
+                @if (success)
+                {
+                    <MudText Color="Color.Success">Success</MudText>
+                }
+                else
+                {
+                    <MudText Color="@Color.Error">
+                        <ValidationSummary />
+                    </MudText>
+                }
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="12">
+            <MudText Typo="Typo.body2" Align="Align.Center">
+                Fill out the form correctly to see the success message.
+            </MudText>
+        </MudItem>
+        @* <MudImage Fluid="true" Src="images/iceland.jpg" Alt="Swedish Farm House" Class="rounded-lg"/> *@
+    </MudGrid>
+</EditForm>
+
+@code {
+    private Models.Petition petition { get; set; } = new Models.Petition();
+    private bool success = false;
+    
+
+    private async Task Insert()
+    {
+        success = true;
+        try
+        {
+            await _petitionService.CreatePetitionAsync(petition);
+            petition = new Models.Petition(); 
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
+        finally
+        {
+            success = false;
+            StateHasChanged();
+        }
+    }
+
+}

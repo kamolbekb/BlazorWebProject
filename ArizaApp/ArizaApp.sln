@@ -1,0 +1,51 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Client", "Client", "{DC8B49F0-06C3-4377-AE33-6DF0E14ECF14}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Server", "Server", "{F67F0185-8057-4A7B-B860-7792922A42F1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nafaqa.API", "Server\Nafaqa.API\Nafaqa.API.csproj", "{6B3D9490-6A48-43DB-9F69-2C876DE5C494}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nafaqa.Web", "Client\Nafaqa.Web\Nafaqa.Web.csproj", "{5EA28FF2-DAE4-4898-A6AA-456971C4D303}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nafaqa.Application", "Server\Nafaqa.Application\Nafaqa.Application.csproj", "{10C7B3B8-06AC-4C75-A83F-535A5C26EAD5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nafaqa.DataAccess", "Server\Nafaqa.DataAccess\Nafaqa.DataAccess.csproj", "{1C3F2F8F-54AC-47F9-87DD-88C9FD9498B9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nafaqa.Core", "Server\Nafaqa.Core\Nafaqa.Core.csproj", "{94FF784A-E880-429C-8AD7-14477FD804F7}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{6B3D9490-6A48-43DB-9F69-2C876DE5C494} = {F67F0185-8057-4A7B-B860-7792922A42F1}
+		{5EA28FF2-DAE4-4898-A6AA-456971C4D303} = {DC8B49F0-06C3-4377-AE33-6DF0E14ECF14}
+		{10C7B3B8-06AC-4C75-A83F-535A5C26EAD5} = {F67F0185-8057-4A7B-B860-7792922A42F1}
+		{1C3F2F8F-54AC-47F9-87DD-88C9FD9498B9} = {F67F0185-8057-4A7B-B860-7792922A42F1}
+		{94FF784A-E880-429C-8AD7-14477FD804F7} = {F67F0185-8057-4A7B-B860-7792922A42F1}
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{6B3D9490-6A48-43DB-9F69-2C876DE5C494}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6B3D9490-6A48-43DB-9F69-2C876DE5C494}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6B3D9490-6A48-43DB-9F69-2C876DE5C494}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6B3D9490-6A48-43DB-9F69-2C876DE5C494}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5EA28FF2-DAE4-4898-A6AA-456971C4D303}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5EA28FF2-DAE4-4898-A6AA-456971C4D303}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5EA28FF2-DAE4-4898-A6AA-456971C4D303}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5EA28FF2-DAE4-4898-A6AA-456971C4D303}.Release|Any CPU.Build.0 = Release|Any CPU
+		{10C7B3B8-06AC-4C75-A83F-535A5C26EAD5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{10C7B3B8-06AC-4C75-A83F-535A5C26EAD5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{10C7B3B8-06AC-4C75-A83F-535A5C26EAD5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{10C7B3B8-06AC-4C75-A83F-535A5C26EAD5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1C3F2F8F-54AC-47F9-87DD-88C9FD9498B9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1C3F2F8F-54AC-47F9-87DD-88C9FD9498B9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1C3F2F8F-54AC-47F9-87DD-88C9FD9498B9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1C3F2F8F-54AC-47F9-87DD-88C9FD9498B9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{94FF784A-E880-429C-8AD7-14477FD804F7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{94FF784A-E880-429C-8AD7-14477FD804F7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{94FF784A-E880-429C-8AD7-14477FD804F7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{94FF784A-E880-429C-8AD7-14477FD804F7}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

@@ -34,18 +34,10 @@
         <MudItem xs="12" sm="7">
             <MudCard>
                 <MudCardContent>
-                    <MudTextField Label="Full name" 
-                                  @bind-Value="petition.FullName" For="@(() => petition.FullName)"/>
-                    <MudTextField Label="Passport Seria" Class="mt-3"
-                                  @bind-Value="petition.PassportSeria" For="@(() => petition.PassportSeria)"/>
-                    <MudTextField Label="Passport Number" Class="mt-3"
-                                  @bind-Value="petition.PassportNumber" For="@(() => petition.PassportNumber)"/>
-                    <MudTextField Label="Gender" Class="mt-3"
-                                  @bind-Value="petition.Gender" For="@(() => petition.Gender)"/>
-                    <MudTextField Label="Address" Class="mt-3"
-                                  @bind-Value="petition.Address" For="@(() => petition.Address)"/>
-                    <MudTextField Label="Phone Number" Class="mt-3"
-                                  @bind-Value="petition.PhoneNumber" For="@(() => petition.PhoneNumber)"/>
+                    <MudTextField Label="Enter your UserID" Class="mt-3"
+                                  @bind-Value="petition.PersonId" For="@(() => petition.PersonId)"/>
+                    <MudTextField Label="Write your Letter" Class="mt-3"
+                                  @bind-Value="petition.Letter" For="@(() => petition.Letter)"/>
                     <MudTextField Label="Allowance type" Class="mt-3"
                                   @bind-Value="petition.Allowance" For="@(() => petition.Allowance)"/>
                 </MudCardContent>

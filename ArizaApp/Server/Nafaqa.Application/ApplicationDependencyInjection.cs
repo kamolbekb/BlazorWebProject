@@ -21,6 +21,7 @@ public static class ApplicationDependencyInjection
     private static void AddServices(this IServiceCollection services,IWebHostEnvironment env)
     {
         services.AddScoped<IPetitionService, PetitionService>();
+        services.AddScoped<IPersonService, PersonService>();
     }
 
     private static void RegisterAutoMapper(this IServiceCollection services)

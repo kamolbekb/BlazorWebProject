@@ -12,11 +12,19 @@ public class PetitionService
         _httpClient = httpClient;
     }
 
-    public async Task<Petition> CreatePetitionAsync(Petition petition)
+    public async Task<int> CreatePetitionAsync(Petition petition)
     {
         var response = await _httpClient.PostAsJsonAsync("Petitions", petition);
         response.EnsureSuccessStatusCode();
         
-        return await response.Content.ReadFromJsonAsync<Petition>();
+        return await response.Content.ReadFromJsonAsync<int>();
+    }
+
+    public async Task<IEnumerable<Petition>> GetPetitionsAsync()
+    {
+        var response = await _httpClient.GetAsync("Petitions");
+        response.EnsureSuccessStatusCode();
+        
+        return await response.Content.ReadFromJsonAsync<IEnumerable<Petition>>();
     }
 }

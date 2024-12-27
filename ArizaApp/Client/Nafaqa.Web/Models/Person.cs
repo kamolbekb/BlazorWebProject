@@ -1,10 +1,8 @@
-using Nafaqa.Core.Common;
-using Nafaqa.Core.Enums;
+namespace Nafaqa.Web.Models;
 
-namespace Nafaqa.Core.Entities;
-
-public class Person : BaseEntity<int>
+public class Person
 {
+    public int Id { get; set; }
     public string FullName { get; set; }
     public Gender Gender { get; set; }
     public string PassportSeria { get; set; }

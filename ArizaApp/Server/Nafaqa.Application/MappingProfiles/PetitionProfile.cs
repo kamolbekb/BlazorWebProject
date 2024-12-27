@@ -10,5 +10,6 @@ public class PetitionProfile : Profile
     {
         CreateMap<CreatePetitionModel, Petition>();
         CreateMap<Petition, PetitionResponseModel>();
+        CreateMap<UpdatePetitionModel, Petition>();
     }
 }

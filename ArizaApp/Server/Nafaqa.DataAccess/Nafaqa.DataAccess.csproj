@@ -23,9 +23,5 @@
     <ItemGroup>
       <ProjectReference Include="..\Nafaqa.Core\Nafaqa.Core.csproj" />
     </ItemGroup>
-    
-    <ItemGroup>
-      <Folder Include="Persistence\Configurations\" />
-    </ItemGroup>
 
 </Project>

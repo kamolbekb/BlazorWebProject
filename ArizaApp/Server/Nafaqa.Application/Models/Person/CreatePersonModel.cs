@@ -1,9 +1,8 @@
-using Nafaqa.Core.Common;
 using Nafaqa.Core.Enums;
 
-namespace Nafaqa.Core.Entities;
+namespace Nafaqa.Application.Models.Person;
 
-public class Person : BaseEntity<int>
+public class CreatePersonModel
 {
     public string FullName { get; set; }
     public Gender Gender { get; set; }
@@ -11,5 +10,7 @@ public class Person : BaseEntity<int>
     public long PassportNumber { get; set; }
     public string Address { get; set; }
     public string PhoneNumber { get; set; }
-    public ICollection<Petition> Petitions { get; set; }
 }
+
+public class CreatePersonResponseModel : BaseResponseModel<int>
+{ }

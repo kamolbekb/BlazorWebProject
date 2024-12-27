@@ -37,7 +37,9 @@ app.UseSwagger();
 app.UseSwaggerUI(c => { c.SwaggerEndpoint("/swagger/v1/swagger.json", "N-Tier V1"); });
 
 app.UseCors(corsPolicyBuilder =>
-    corsPolicyBuilder.WithOrigins("https://192.168.31.172:7223")
+    corsPolicyBuilder
+        .AllowAnyOrigin()
+        // .WithOrigins("https://192.168.31.172:7223")
         .AllowAnyMethod()
         .AllowAnyHeader()
 );

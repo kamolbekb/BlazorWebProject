@@ -33,6 +33,13 @@ public class PetitionsController : ApiController
         return Ok( _petitionService.GetAllPetitions());
     }
 
+    [HttpGet]
+    [Route("GetPersonPetitions")]
+    public IActionResult GetPeoplePetitions(int personId)
+    {
+        return Ok( _petitionService.GetPersonsPetitions(personId));
+    }
+    
     [HttpPut(Name = "UpdatePetition")]
     public async Task<IActionResult> UpdatePetition(int id, UpdatePetitionModel model)
     {

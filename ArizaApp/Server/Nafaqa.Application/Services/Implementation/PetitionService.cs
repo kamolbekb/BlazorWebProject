@@ -46,11 +46,20 @@ public class PetitionService: IPetitionService
         return _mapper.Map<PetitionResponseModel>(entity);
     }
 
+    public IEnumerable<PetitionResponseModel> GetPersonsPetitions(int personId)
+    {
+        var entities = _petitionRepository
+            .SelectAll()
+            .Where(petition => petition.PersonId == personId );
+        
+        return _mapper.Map<IEnumerable<PetitionResponseModel>>(entities);
+    }
+
     public IEnumerable<PetitionResponseModel> GetAllPetitions()
     {
         var entities = _petitionRepository
             .SelectAll()
-            .OrderByDescending(x => x.ApplicationDate);
+            .OrderBy(x => x.Id);
         
         return _mapper.Map<IEnumerable<PetitionResponseModel>>(entities);
     }

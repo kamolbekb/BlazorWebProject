@@ -47,11 +47,11 @@ public class PersonService : IPersonService
     {
         var entities = _personRepository
             .SelectAll()
-            .OrderByDescending(x => x.FullName);
+            .OrderBy(x => x.Id);
 
         return _mapper.Map<IEnumerable<PersonResponseModel>>(entities);
     }
-
+    
     public async Task<BaseResponseModel<int>> UpdatePersonAsync(int id, UpdatePersonModel updatePersonModel)
     {
         var entity = _personRepository.SelectAll()

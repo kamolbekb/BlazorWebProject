@@ -1,0 +1,187 @@
+@page "/persons"
+@inject HttpClient Http
+
+<h3>Persons</h3>
+
+<!-- Button to add a new person -->
+<button class="btn btn-primary" @onclick="ToggleAddForm">Add New Person</button>
+
+@if (IsAdding)
+{
+    <div class="form-overlay">
+        <div class="form-container">
+            <h4>Add New Person</h4>
+            <EditForm Model="NewPerson" OnValidSubmit="AddPerson">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+
+                <div class="form-group">
+                    <label>Full Name:</label>
+                    <InputText @bind-Value="NewPerson.FullName" class="form-control" />
+                </div>
+
+                <div class="form-group">
+                    <label>Gender:</label>
+                    <InputSelect @bind-Value="NewPerson.Gender" class="form-control">
+                        @foreach (var value in Enum.GetValues<Gender>())
+                        {
+                            <option value="@value">@value</option>
+                        }
+                    </InputSelect>
+                </div>
+
+                <div class="form-group">
+                    <label>Passport Series:</label>
+                    <InputText @bind-Value="NewPerson.PassportSeria" class="form-control" />
+                </div>
+
+                <div class="form-group">
+                    <label>Passport Number:</label>
+                    <InputNumber @bind-Value="NewPerson.PassportNumber" class="form-control" />
+                </div>
+
+                <div class="form-group">
+                    <label>Address:</label>
+                    <InputText @bind-Value="NewPerson.Address" class="form-control" />
+                </div>
+
+                <div class="form-group">
+                    <label>Phone Number:</label>
+                    <InputText @bind-Value="NewPerson.PhoneNumber" class="form-control" />
+                </div>
+
+                <div class="form-buttons">
+                    <button type="submit" class="btn btn-success">Submit</button>
+                    <button type="button" class="btn btn-secondary" @onclick="ToggleAddForm">Cancel</button>
+                </div>
+            </EditForm>
+        </div>
+    </div>
+}
+
+@if (Persons != null)
+{
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Full Name</th>
+            <th>Gender</th>
+            <th>Address</th>
+            <th>Phone Number</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var person in Persons)
+        {
+            <tr>
+                <td>@person.Id</td>
+                <td>@person.FullName</td>
+                <td>@person.Gender</td>
+                <td>@person.Address</td>
+                <td>@person.PhoneNumber</td>
+                <td>
+                    @* <button class="btn btn-info" @onclick="() => LoadPetitions(person,person.Id)">View Petitions</button> *@
+                    <button class="btn @((SelectedPerson == person) ? "btn-secondary" : "btn-info")"
+                            @onclick="() => LoadPetitions(person,person.Id)">
+                        @((SelectedPerson == person) ? "Hide Petitions" : "View Petitions")
+                    </button>
+                </td>
+            </tr>
+
+            @if (SelectedPerson == person)
+            {
+                <tr>
+                    <td colspan="6">
+                        <h4>Petitions</h4>
+                        <ul>
+                            @foreach (var petition in Petitions)
+                            {
+                                <li>Allowance type: @petition.Allowance   |   Letter: @petition.Letter (Date: @petition.ApplicationDate.ToShortDateString())</li>
+                            }
+                        </ul>
+                    </td>
+                </tr>
+            }
+        }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>Loading...</p>
+}
+
+@code {
+    private List<Person> Persons;
+    private List<Petition> Petitions;
+    private Person NewPerson = new();
+    private bool IsAdding = false;
+    private Person SelectedPerson;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadPersons();
+    }
+
+    private async Task LoadPersons()
+    {
+        Persons = await Http.GetFromJsonAsync<List<Person>>("Persons");
+    }
+
+    private async Task LoadPetitions(Person person,int id)
+    {
+        Petitions = await Http.GetFromJsonAsync<List<Petition>>($"/Petitions/GetPersonPetitions?personId={id}");
+        SelectedPerson = SelectedPerson == person ? null : person;
+    }
+
+    private void ToggleAddForm()
+    {
+        IsAdding = !IsAdding;
+    }
+
+    private async Task AddPerson()
+    {
+        await Http.PostAsJsonAsync("Persons", NewPerson);
+        await LoadPersons();
+        ToggleAddForm();
+        NewPerson = new();
+    }
+
+    private void TogglePetitions(Person person)
+    {
+        
+    }
+    
+    public class Person
+    {
+        public int Id {get; set;}
+        public string FullName { get; set; }
+        public Gender Gender { get; set; }
+        public string PassportSeria { get; set; }
+        public long PassportNumber { get; set; }
+        public string Address { get; set; }
+        public string PhoneNumber { get; set; }
+    }
+    
+    public class Petition
+    {
+        public int Id { get; set; }
+        public AllowanceType Allowance { get; set; }
+        public int PersonId { get; set; }
+        public string Letter { get; set; }
+        public DateOnly ApplicationDate { get; set; }
+    }
+    
+    public enum AllowanceType
+    {
+        Nogironlik=1,
+        YoshgaDoir
+    }
+    public enum Gender
+    {
+        Male,
+        Female
+    }
+}

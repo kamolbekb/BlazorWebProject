@@ -14,9 +14,16 @@ public class DatabaseContext : DbContext
     }
 
     public DbSet<Petition> Petitions { get; set; }
+    public DbSet<Person> Persons { get; set; }
+    public DbSet<Photo> Photos { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<Person>()
+            .HasMany(p => p.Photos)
+            .WithOne(p => p.Person)
+            .HasForeignKey(p => p.PersonId);
+        
         modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
     }
 }

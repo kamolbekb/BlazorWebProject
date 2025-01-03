@@ -1,4 +1,5 @@
 @page "/persons"
+@using Nafaqa.Web.Models
 @inject HttpClient Http
 
 <h3>Persons</h3>
@@ -12,12 +13,12 @@
         <div class="form-container">
             <h4>Add New Person</h4>
             <EditForm Model="NewPerson" OnValidSubmit="AddPerson">
-                <DataAnnotationsValidator />
-                <ValidationSummary />
+                <DataAnnotationsValidator/>
+                <ValidationSummary/>
 
                 <div class="form-group">
                     <label>Full Name:</label>
-                    <InputText @bind-Value="NewPerson.FullName" class="form-control" />
+                    <InputText @bind-Value="NewPerson.FullName" class="form-control"/>
                 </div>
 
                 <div class="form-group">
@@ -32,22 +33,32 @@
 
                 <div class="form-group">
                     <label>Passport Series:</label>
-                    <InputText @bind-Value="NewPerson.PassportSeria" class="form-control" />
+                    <InputText @bind-Value="NewPerson.PassportSeria" class="form-control"/>
                 </div>
 
                 <div class="form-group">
                     <label>Passport Number:</label>
-                    <InputNumber @bind-Value="NewPerson.PassportNumber" class="form-control" />
+                    <InputNumber @bind-Value="NewPerson.PassportNumber" class="form-control"/>
                 </div>
 
                 <div class="form-group">
                     <label>Address:</label>
-                    <InputText @bind-Value="NewPerson.Address" class="form-control" />
+                    <InputText @bind-Value="NewPerson.Address" class="form-control"/>
                 </div>
 
                 <div class="form-group">
-                    <label>Phone Number:</label>
-                    <InputText @bind-Value="NewPerson.PhoneNumber" class="form-control" />
+                    <label for="PhoneNumberInput">Phone Number:</label>
+                    <InputText id="PhoneNumberInput"
+                               @bind-Value="NewPerson.PhoneNumber"
+                               class="form-control"
+                               maxlength="18"
+                               placeholder="+998(##)-###-##-##"
+                               @oninput="HandleInputChange"/>
+                </div>
+
+                <div class="form-group">
+                    <label>Upload Photo:</label>
+                    <InputFile OnChange="HandlePhotoUpload"/>
                 </div>
 
                 <div class="form-buttons">
@@ -61,52 +72,160 @@
 
 @if (Persons != null)
 {
-    <table class="table table-striped">
-        <thead>
-        <tr>
-            <th>ID</th>
-            <th>Full Name</th>
-            <th>Gender</th>
-            <th>Address</th>
-            <th>Phone Number</th>
-            <th>Actions</th>
-        </tr>
-        </thead>
-        <tbody>
-        @foreach (var person in Persons)
-        {
+    <div class="table-container">
+        <table class="table table-striped">
+            <thead>
             <tr>
-                <td>@person.Id</td>
-                <td>@person.FullName</td>
-                <td>@person.Gender</td>
-                <td>@person.Address</td>
-                <td>@person.PhoneNumber</td>
-                <td>
-                    @* <button class="btn btn-info" @onclick="() => LoadPetitions(person,person.Id)">View Petitions</button> *@
-                    <button class="btn @((SelectedPerson == person) ? "btn-secondary" : "btn-info")"
-                            @onclick="() => LoadPetitions(person,person.Id)">
-                        @((SelectedPerson == person) ? "Hide Petitions" : "View Petitions")
-                    </button>
-                </td>
+                <th>ID</th>
+                <th>Full Name</th>
+                <th>Passport Seria</th>
+                <th>Passport Number</th>
+                <th>Gender</th>
+                <th>Address</th>
+                <th>Phone Number</th>
+                <th>Actions</th>
             </tr>
-
-            @if (SelectedPerson == person)
+            </thead>
+            <tbody>
+            @foreach (var person in Persons)
             {
                 <tr>
-                    <td colspan="6">
-                        <h4>Petitions</h4>
-                        <ul>
-                            @foreach (var petition in Petitions)
-                            {
-                                <li>Allowance type: @petition.Allowance   |   Letter: @petition.Letter (Date: @petition.ApplicationDate.ToShortDateString())</li>
-                            }
-                        </ul>
-                    </td>
+                    <td>@person.Id</td>
+                    <td>@person.FullName</td>
+                    <td>@person.PassportSeria</td>
+                    <td>@person.PassportNumber</td>
+                    <td>@person.Gender</td>
+                    <td>@person.Address</td>
+                    <td>@person.PhoneNumber</td>
+                    <MudTd>
+                        <button class="btn @((SelectedPerson == person) ? "btn-secondary" : "btn-info")"
+                                @onclick="() => LoadDetails(person)">
+                            @((SelectedPerson == person) ? "Hide Details" : "View Details")
+                        </button>
+                        <button class="btn btn-danger" @onclick="() => DeletePerson(person.Id)">Delete</button>
+                        @* <button class="btn btn-danger" @onclick="() => DeletePetition(petition.Id)">Delete</button> *@
+                    </MudTd>
                 </tr>
+
+
+                @if (SelectedPerson == person)
+                {
+                    <tr>
+                        <td colspan="6">
+                            <h4>Details</h4>
+                            <p><strong>Photo:</strong></p>
+                            @if (!string.IsNullOrEmpty(PersonPhoto))
+                            {
+                                <img src="@PersonPhoto" alt="Photo"
+                                     style="width: 150px; height: 150px; object-fit: cover;"/>
+                                @if (string.IsNullOrEmpty(PersonPhoto))
+                                {
+                                    <p>Photo path is null or empty.</p>
+                                }
+                            }
+                            else
+                            {
+                                <p>No Photo Available</p>
+                            }
+
+                            <h4>Petitions</h4>
+                            <ul>
+                                @if (Petitions != null && Petitions.Any())
+                                {
+                                    @foreach (var petition in Petitions)
+                                    {
+                                        <li>Allowance
+                                            type: @petition.Allowance |
+                                            Letter: @petition.Letter (Date: @petition.ApplicationDate.ToShortDateString())
+                                        </li>
+                                    }
+                                }
+                                else
+                                {
+                                    <li>No Petitions Found</li>
+                                }
+                            </ul>
+                        </td>
+                    </tr>
+                }
+
+                #region Mud
+
+                @* <MudCard Class="my-2" Style="position:relative;"> *@
+                @*     @if (SelectedPerson == person) *@
+                @*     { *@
+                @*         <MudCardMedia Image="@PersonPhoto"  Height="200"/> *@
+                @*         //<img src="@PersonPhoto" alt="Photo" *@
+                @*
+                @*              $1$                      style="width: 150px; height: 150px; object-fit: cover;"/>#1# *@
+                @*     } *@
+                @* </MudCard> *@
+
+                #endregion
+                
+                #region MyRegion
+
+                @* @if (SelectedPerson != null) *@
+                @* { *@
+                @*     <div class="form-overlay"> *@
+                @*         <div class="form-container"> *@
+                @*             <h4>Person Details</h4> *@
+                @*              *@
+                @*                 <div> *@
+                @*                     <p><strong>Photo:</strong></p> *@
+                @*                     @if (!string.IsNullOrEmpty(PersonPhoto)) *@
+                @*                     { *@
+                @*                         <img src="@PersonPhoto" alt="Photo" *@
+                @*                              style="width: 150px; height: 150px; object-fit: cover;"/> *@
+                @*                     } *@
+                @*                     else *@
+                @*                     { *@
+                @*                         <p>No Photo Available</p> *@
+                @*                     } *@
+                @*                 </div> *@
+                @*             <div class="form-group"> *@
+                @*                  *@
+                @*                 <label>Full Name:</label> <div>@SelectedPerson.FullName</div> *@
+                @*                 <p><strong>Gender:</strong> @SelectedPerson.Gender</p> *@
+                @*                 <p><strong>Passport Series:</strong> @SelectedPerson.PassportSeria</p> *@
+                @*                 <p><strong>Passport Number:</strong> @SelectedPerson.PassportNumber</p> *@
+                @*                 <p><strong>Address:</strong> @SelectedPerson.Address</p> *@
+                @*                 <p><strong>Phone Number:</strong> @SelectedPerson.PhoneNumber</p> *@
+                @* *@
+                @*             </div> *@
+                @* *@
+                @*             <div class="form-group"> *@
+                @*                 <h4>Petitions</h4> *@
+                @*                 <ul> *@
+                @*                     @if (Petitions != null && Petitions.Any()) *@
+                @*                     { *@
+                @*                         @foreach (var petition in Petitions) *@
+                @*                         { *@
+                @*                             <li>Allowance *@
+                @*                                 type: @petition.Allowance | *@
+                @*                                 Letter: @petition.Letter (Date: @petition.ApplicationDate.ToShortDateString()) *@
+                @*                             </li> *@
+                @*                         } *@
+                @*                     } *@
+                @*                     else *@
+                @*                     { *@
+                @*                         <li>No Petitions Found</li> *@
+                @*                     } *@
+                @*                 </ul> *@
+                @*             </div> *@
+                @* *@
+                @*             <div class="form-buttons"> *@
+                @*                 <button class="btn btn-secondary" @onclick="() => SelectedPerson = null">Close</button> *@
+                @*             </div> *@
+                @*         </div> *@
+                @*     </div> *@
+                @* } *@
+
+                #endregion
             }
-        }
-        </tbody>
-    </table>
+            </tbody>
+        </table>
+    </div>
 }
 else
 {
@@ -119,6 +238,8 @@ else
     private Person NewPerson = new();
     private bool IsAdding = false;
     private Person SelectedPerson;
+    private IBrowserFile UploadedPhoto;
+    private string PersonPhoto;
 
     protected override async Task OnInitializedAsync()
     {
@@ -127,13 +248,65 @@ else
 
     private async Task LoadPersons()
     {
-        Persons = await Http.GetFromJsonAsync<List<Person>>("Persons");
+        Persons = await Http.GetFromJsonAsync<List<Person>>("/Persons");
     }
 
-    private async Task LoadPetitions(Person person,int id)
+    private async Task LoadDetails(Person person)
     {
-        Petitions = await Http.GetFromJsonAsync<List<Petition>>($"/Petitions/GetPersonPetitions?personId={id}");
-        SelectedPerson = SelectedPerson == person ? null : person;
+        if (SelectedPerson == person)
+        {
+            SelectedPerson = null;
+            Petitions = null;
+            PersonPhoto = null;
+        }
+        else
+        {
+            SelectedPerson = person;
+
+            Petitions = await LoadPetitionsAsync(person.Id);
+
+            PersonPhoto = await GetPersonsPhotoAsync(person.Id);
+            //PersonPhoto = string.IsNullOrEmpty(photoPath) ? null : $"{photoPath}";
+        }
+    }
+
+    private void HandleInputChange(ChangeEventArgs e)
+    {
+        var value = e.Value?.ToString();
+        if (!string.IsNullOrEmpty(value))
+        {
+            // Remove all non-numeric characters
+            value = new string(value.Where(char.IsDigit).ToArray());
+
+            // Apply mask if value length is at least 10
+            if (value.Length >= 1)
+            {
+                var formattedValue = $"+998({value.Substring(0, 2)}){value.Substring(2, 3)}-{value.Substring(5, 2)}-{value.Substring(7, 2)}";
+                NewPerson.PhoneNumber = formattedValue;
+            }
+            else
+            {
+                NewPerson.PhoneNumber = value;
+            }
+        }
+    }
+
+    private async Task<List<Petition>> LoadPetitionsAsync(int personId)
+    {
+        return await Http.GetFromJsonAsync<List<Petition>>($"/Petitions/GetPersonPetitions?personId={personId}");
+    }
+
+    private async Task<string> GetPersonsPhotoAsync(int personId)
+    {
+        var imageBytes = await Http.GetByteArrayAsync($"/Photos/GetPersonPhoto?personId={personId}");
+        var base64String = Convert.ToBase64String(imageBytes);
+        return $"data:image/jpeg;base64,{base64String}";
+    }
+
+    private async Task DeletePerson(int id)
+    {
+        await Http.DeleteAsync($"Persons?id={id}");
+        await LoadPersons();
     }
 
     private void ToggleAddForm()
@@ -143,28 +316,66 @@ else
 
     private async Task AddPerson()
     {
-        await Http.PostAsJsonAsync("Persons", NewPerson);
-        await LoadPersons();
+        var personResponse = await Http.PostAsJsonAsync("/Persons", NewPerson);
+        if (personResponse.IsSuccessStatusCode)
+        {
+            var person = await personResponse.Content.ReadFromJsonAsync<Person>();
+            //Thread.Sleep(1000);
+            if (UploadedPhoto != null)
+            {
+                await AddPhotoToPerson(person.Id, UploadedPhoto);
+            }
+
+            await LoadPersons();
+        }
+
         ToggleAddForm();
         NewPerson = new();
     }
 
-    private void TogglePetitions(Person person)
+    private void HandlePhotoUpload(InputFileChangeEventArgs e)
     {
-        
+        UploadedPhoto = e.File;
     }
-    
+
+    private async Task AddPhotoToPerson(int personId, IBrowserFile file)
+    {
+        if (file == null)
+        {
+            throw new ArgumentException("Invalid file.");
+        }
+
+        var content = new MultipartFormDataContent();
+
+        content.Add(new StreamContent(file.OpenReadStream()), "file", file.Name);
+        await Http.PostAsync($"/Photos/AddPhotoToPerson{personId}", content);
+    }
+
     public class Person
     {
-        public int Id {get; set;}
+        public int Id { get; set; }
         public string FullName { get; set; }
         public Gender Gender { get; set; }
         public string PassportSeria { get; set; }
         public long PassportNumber { get; set; }
         public string Address { get; set; }
         public string PhoneNumber { get; set; }
+        public Photo Photo { get; set; }
     }
-    
+
+    public class Photo
+    {
+        public int Id { get; set; }
+        public int PersonId { get; set; }
+        public string FilePath { get; set; }
+    }
+
+    public enum Gender
+    {
+        Male,
+        Female
+    }
+
     public class Petition
     {
         public int Id { get; set; }
@@ -173,15 +384,11 @@ else
         public string Letter { get; set; }
         public DateOnly ApplicationDate { get; set; }
     }
-    
+
     public enum AllowanceType
     {
-        Nogironlik=1,
+        Nogironlik,
         YoshgaDoir
     }
-    public enum Gender
-    {
-        Male,
-        Female
-    }
+
 }

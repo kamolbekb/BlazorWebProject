@@ -3,6 +3,7 @@ using FluentValidation.AspNetCore;
 using Microsoft.EntityFrameworkCore;
 using Nafaqa.Application;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
 using Nafaqa.Application.Models.Validators;
 using Nafaqa.DataAccess;
 using Nafaqa.API.Filters;
@@ -26,11 +27,21 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddLogging();
 
+var imageFolderPath = Path.Combine(Directory.GetCurrentDirectory(), builder.Configuration.GetValue<string>("ImageFolderPath"));
+
+builder.Services.AddSingleton(imageFolderPath);
+
 builder.Services.AddDataAccess(builder.Configuration)
     .AddApplication(builder.Environment);
 
 var app = builder.Build();
 
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(
+        Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images")),
+    RequestPath = "/images"
+});
 using var scope = app.Services.CreateScope();
 
 app.UseSwagger();

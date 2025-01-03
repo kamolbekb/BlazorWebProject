@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Nafaqa.Core.Entities;
 using Nafaqa.DataAccess.Persistence;
 using Nafaqa.DataAccess.Repositories;
 using Nafaqa.DataAccess.Repositories.Implementation;
@@ -22,6 +23,8 @@ public static class DataAccessDependencyInjection
     {
         services.AddScoped<IPetitionRepository, PetitionRepository>();
         services.AddScoped<IPersonRepository, PersonRepository>();
+        services.AddScoped<IPhotoRepository, PhotoRepository>();
+        
     }
 
     private static void AddDatabase(this IServiceCollection services, IConfiguration configuration)

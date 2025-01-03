@@ -9,5 +9,7 @@ public class Person
     public long PassportNumber { get; set; }
     public string Address { get; set; }
     public string PhoneNumber { get; set; }
+    
     public ICollection<Petition> Petitions { get; set; }
+    public Photo Photo { get; set; }
 }

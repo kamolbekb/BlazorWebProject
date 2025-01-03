@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using Nafaqa.Core.Common;
 using Nafaqa.Core.Enums;
 
@@ -11,5 +12,9 @@ public class Person : BaseEntity<int>
     public long PassportNumber { get; set; }
     public string Address { get; set; }
     public string PhoneNumber { get; set; }
+    public ICollection<Photo> Photos { get; set; }
+    [JsonIgnore]
     public ICollection<Petition> Petitions { get; set; }
+
+   
 }

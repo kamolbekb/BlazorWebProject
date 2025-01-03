@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Nafaqa.DataAccess.Persistence.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20241226111810_Initial")]
+    [Migration("20241228073614_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -89,6 +89,28 @@ namespace Nafaqa.DataAccess.Persistence.Migrations
                     b.ToTable("Petitions", (string)null);
                 });
 
+            modelBuilder.Entity("Nafaqa.Core.Entities.Photo", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("FilePath")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("PersonId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PersonId");
+
+                    b.ToTable("Photos");
+                });
+
             modelBuilder.Entity("Nafaqa.Core.Entities.Petition", b =>
                 {
                     b.HasOne("Nafaqa.Core.Entities.Person", "Person")
@@ -100,9 +122,22 @@ namespace Nafaqa.DataAccess.Persistence.Migrations
                     b.Navigation("Person");
                 });
 
+            modelBuilder.Entity("Nafaqa.Core.Entities.Photo", b =>
+                {
+                    b.HasOne("Nafaqa.Core.Entities.Person", "Person")
+                        .WithMany("Photos")
+                        .HasForeignKey("PersonId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Person");
+                });
+
             modelBuilder.Entity("Nafaqa.Core.Entities.Person", b =>
                 {
                     b.Navigation("Petitions");
+
+                    b.Navigation("Photos");
                 });
 #pragma warning restore 612, 618
         }

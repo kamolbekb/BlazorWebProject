@@ -197,3 +197,34 @@ a, .btn-link {
 .btn-warning:hover {
     background-color: #e0a800;
 }
+
+img {
+    max-width: 100%;
+    border-radius: 4px;
+    margin-bottom: 15px;
+}
+h4 {
+    font-size: 18px;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.form-group div {
+    font-size: 16px;
+    color: #333;
+}
+.form-container {
+    animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

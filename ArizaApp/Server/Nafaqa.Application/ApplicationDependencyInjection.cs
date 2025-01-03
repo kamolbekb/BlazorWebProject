@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Nafaqa.Application.MappingProfiles;
 using Nafaqa.Application.Services;
@@ -22,6 +23,7 @@ public static class ApplicationDependencyInjection
     {
         services.AddScoped<IPetitionService, PetitionService>();
         services.AddScoped<IPersonService, PersonService>();
+        services.AddScoped<IPhotoService, PhotoService>();
     }
 
     private static void RegisterAutoMapper(this IServiceCollection services)

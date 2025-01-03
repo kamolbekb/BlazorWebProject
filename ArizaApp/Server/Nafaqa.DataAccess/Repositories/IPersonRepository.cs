@@ -4,5 +4,4 @@ namespace Nafaqa.DataAccess.Repositories;
 
 public interface IPersonRepository : IBaseRepository<Person, int>
 {
-    
 }

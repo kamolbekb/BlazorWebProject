@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using Nafaqa.Core.Entities;
 using Nafaqa.DataAccess.Persistence;
 
@@ -8,4 +9,6 @@ public class PersonRepository : BaseRepository<Person, int>,IPersonRepository
     public PersonRepository(DatabaseContext context) : base(context)
     {
     }
+    
+    
 }

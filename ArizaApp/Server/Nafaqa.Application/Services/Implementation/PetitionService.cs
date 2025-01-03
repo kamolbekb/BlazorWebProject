@@ -7,7 +7,7 @@ using Nafaqa.DataAccess.Repositories;
 
 namespace Nafaqa.Application.Services.Implementation;
 
-public class PetitionService: IPetitionService
+public class PetitionService : IPetitionService
 {
     private readonly IMapper _mapper;
     private readonly IPetitionRepository _petitionRepository;
@@ -27,22 +27,21 @@ public class PetitionService: IPetitionService
         {
             Id = addedPetition.Id,
         };
-
     }
 
     public async Task<PetitionResponseModel> GetPetitionAsync(int petitionId)
     {
         var entity = await _petitionRepository.SelectByIdAsync(petitionId);
-        
+
         if (entity == null)
         {
             return new PetitionResponseModel()
             {
                 Id = petitionId,
-                Errors = new List<string>{ "There is no such person in the database."}
+                Errors = new List<string> { "There is no such person in the database." }
             };
         }
-        
+
         return _mapper.Map<PetitionResponseModel>(entity);
     }
 
@@ -50,8 +49,8 @@ public class PetitionService: IPetitionService
     {
         var entities = _petitionRepository
             .SelectAll()
-            .Where(petition => petition.PersonId == personId );
-        
+            .Where(petition => petition.PersonId == personId);
+
         return _mapper.Map<IEnumerable<PetitionResponseModel>>(entities);
     }
 
@@ -60,33 +59,45 @@ public class PetitionService: IPetitionService
         var entities = _petitionRepository
             .SelectAll()
             .OrderBy(x => x.Id);
-        
+
         return _mapper.Map<IEnumerable<PetitionResponseModel>>(entities);
     }
 
     public async Task<BaseResponseModel<int>> UpdatePetitionAsync(int id, UpdatePetitionModel updatePetitionModel)
     {
-        var entity = _petitionRepository.
-                SelectAll()
-                .FirstOrDefault(i=>i.Id == id);
-        
+        var entity = _petitionRepository.SelectAll()
+            .FirstOrDefault(i => i.Id == id);
+
         if (entity is null)
         {
             return new BaseResponseModel<int>
             {
                 Id = -1,
                 Errors = new List<string> { "You are trying to Update a Person that doesn't exist" }
-            };        
+            };
         }
-        
-        await _petitionRepository.UpdateAsync(_mapper.Map<Petition>(entity));
-        await _petitionRepository.SaveChangesAsync();
-        
-        return new BaseResponseModel<int>
+
+        _mapper.Map(updatePetitionModel, entity);
+
+        try
         {
-            Id = id,
-            Errors = null
-        };
+            await _petitionRepository.UpdateAsync(entity);
+            await _petitionRepository.SaveChangesAsync();
+
+            return new BaseResponseModel<int>
+            {
+                Id = entity.Id,
+                Errors = new List<string>()
+            };
+        }
+        catch (Exception ex)
+        {
+            return new BaseResponseModel<int>
+            {
+                Id = -1,
+                Errors = new List<string> { "Error updating petition", ex.Message }
+            };
+        }
     }
 
     public async Task<BaseResponseModel<int>> DeletePetitionAsync(int id)
@@ -98,8 +109,9 @@ public class PetitionService: IPetitionService
             {
                 Id = -1,
                 Errors = new List<string> { "You are trying to Delete a Person that doesn't exist" }
-            };        
+            };
         }
+
         await _petitionRepository.DeleteAsync(entity);
         await _petitionRepository.SaveChangesAsync();
         return new BaseResponseModel<int>

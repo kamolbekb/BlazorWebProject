@@ -50,9 +50,34 @@ namespace Nafaqa.DataAccess.Persistence.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "Photos",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    FilePath = table.Column<string>(type: "text", nullable: false),
+                    PersonId = table.Column<int>(type: "integer", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Photos", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Photos_Persons_PersonId",
+                        column: x => x.PersonId,
+                        principalTable: "Persons",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_Petitions_PersonId",
                 table: "Petitions",
+                column: "PersonId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Photos_PersonId",
+                table: "Photos",
                 column: "PersonId");
         }
 
@@ -60,6 +85,9 @@ namespace Nafaqa.DataAccess.Persistence.Migrations
         {
             migrationBuilder.DropTable(
                 name: "Petitions");
+
+            migrationBuilder.DropTable(
+                name: "Photos");
 
             migrationBuilder.DropTable(
                 name: "Persons");

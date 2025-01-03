@@ -38,6 +38,13 @@ public class PersonsController : ApiController
         return Ok(await _personService.UpdatePersonAsync(id, model));
     }
 
+    [HttpGet]
+    [Route("GetPersonWith")]
+    public async Task<IActionResult> RetrievePersonWith()
+    {
+        return Ok(await _personService.GetPersonWith());
+    }
+
     [HttpDelete(Name = "DeletePerson")]
     public async Task<IActionResult> DeletePerson(int id)
     {

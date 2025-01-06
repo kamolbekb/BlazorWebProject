@@ -1,6 +1,6 @@
 using System.Net.Http.Json;
 using Microsoft.AspNetCore.Components.Forms;
-using Nafaqa.Web.Models;
+using Nafaqa.Web;
 
 namespace Nafaqa.Web.Services;
 

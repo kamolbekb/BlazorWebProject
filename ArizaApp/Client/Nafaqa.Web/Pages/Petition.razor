@@ -1,32 +1,10 @@
 @page "/Petition"
+@using Common
 @using MudBlazor
 @using Nafaqa.Web.Services
 @inject PetitionService _petitionService
 
 <PageTitle>Petition</PageTitle>
-
-@* <MudTextField @bind-Value="petition.FullName" Label="Full Name" Variant="Variant.Outlined" *@
-@*               Margin="Margin.None"/> *@
-@* <MudTextField @bind-Value="petition.PassportSeria" Label="Passport Seria" Variant="Variant.Outlined" *@
-@*               Margin="Margin.Dense"/> *@
-@* <MudTextField @bind-Value="petition.PassportNumber" Label="Passport Number" Variant="Variant.Outlined" *@
-@*               Margin="Margin.Dense"/> *@
-@* <MudTextField @bind-Value="petition.Gender" Label="Gender" Variant="Variant.Outlined" *@
-@*               Margin="Margin.Dense"/> *@
-@* <MudTextField @bind-Value="petition.Address" Label="Address" Variant="Variant.Outlined" *@
-@*               Margin="Margin.Dense"/> *@
-@* <MudTextField @bind-Value="petition.PhoneNumber" Label="Phone Number" Variant="Variant.Outlined" *@
-@*               Margin="Margin.Dense"/> *@
-@* <MudTextField @bind-Value="petition.Allowance" Label="Allowance type" Variant="Variant.Outlined" *@
-@*               Margin="Margin.Dense"/> *@
-@* *@
-@* *@
-@* <div class="d-flex align-end justify-space-between mud-width-full"> *@
-@*     $1$ <div class="d-flex flex-column"> #1# *@
-@*     $1$     <MudText><b>Id:</b> @petition.Id</MudText> #1# *@
-@*     $1$ </div> #1# *@
-@*     <MudButton Variant="Variant.Filled" Disabled="@loading" OnClick="Insert">Insert Model</MudButton> *@
-@* </div> *@
 
 <EditForm Model="@petition" OnValidSubmit="Insert">
     <DataAnnotationsValidator/>
@@ -71,7 +49,7 @@
 </EditForm>
 
 @code {
-    private Models.Petition petition { get; set; } = new Models.Petition();
+    private PetitionDto petition { get; set; } = new PetitionDto();
     private bool success = false;
     
 
@@ -81,7 +59,7 @@
         try
         {
             await _petitionService.CreatePetitionAsync(petition);
-            petition = new Models.Petition(); 
+            petition = new PetitionDto(); 
         }
         catch (Exception ex)
         {

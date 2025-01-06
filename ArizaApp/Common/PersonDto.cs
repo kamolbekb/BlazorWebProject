@@ -1,7 +1,6 @@
-namespace Nafaqa.Web.Models;
+namespace Common;
 
-public class Person
-{
+public class PersonDto{
     public int Id { get; set; }
     public string FullName { get; set; }
     public Gender Gender { get; set; }
@@ -9,7 +8,5 @@ public class Person
     public long PassportNumber { get; set; }
     public string Address { get; set; }
     public string PhoneNumber { get; set; }
-    
-    public ICollection<Petition> Petitions { get; set; }
-    public Photo Photo { get; set; }
+    public PhotoDto PhotoDto { get; set; }
 }

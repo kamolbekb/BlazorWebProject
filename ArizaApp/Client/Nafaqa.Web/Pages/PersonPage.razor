@@ -1,29 +1,32 @@
 @page "/persons"
-@using Nafaqa.Web.Models
+@using Gender = Common.Gender
 @inject HttpClient Http
+@inherits LayoutComponentBase
+@inject NavigationManager NavigationManager
+
 
 <h3>Persons</h3>
 
 <!-- Button to add a new person -->
 <button class="btn btn-primary" @onclick="ToggleAddForm">Add New Person</button>
 
-@if (IsAdding)
+@if (_isAdding)
 {
     <div class="form-overlay">
         <div class="form-container">
             <h4>Add New Person</h4>
-            <EditForm Model="NewPerson" OnValidSubmit="AddPerson">
+            <EditForm Model="_newPerson" OnValidSubmit="AddPerson">
                 <DataAnnotationsValidator/>
                 <ValidationSummary/>
 
                 <div class="form-group">
                     <label>Full Name:</label>
-                    <InputText @bind-Value="NewPerson.FullName" class="form-control"/>
+                    <InputText @bind-Value="_newPerson.FullName" class="form-control"/>
                 </div>
 
                 <div class="form-group">
                     <label>Gender:</label>
-                    <InputSelect @bind-Value="NewPerson.Gender" class="form-control">
+                    <InputSelect @bind-Value="_newPerson.Gender" class="form-control">
                         @foreach (var value in Enum.GetValues<Gender>())
                         {
                             <option value="@value">@value</option>
@@ -33,23 +36,30 @@
 
                 <div class="form-group">
                     <label>Passport Series:</label>
-                    <InputText @bind-Value="NewPerson.PassportSeria" class="form-control"/>
+                    <InputText @bind-Value="_newPerson.PassportSeria"
+                               class="text-uppercase form-control"
+                               maxlength="2"
+                               Placeholder="XX"
+                               @oninput="(e) => _newPerson.PassportSeria = e.Value
+                               .ToString().ToUpper()"/>
                 </div>
 
                 <div class="form-group">
                     <label>Passport Number:</label>
-                    <InputNumber @bind-Value="NewPerson.PassportNumber" class="form-control"/>
+                    <InputNumber @bind-Value="_newPerson.PassportNumber"
+                                 class="form-control"
+                                 Placeholder="12345"/>
                 </div>
 
                 <div class="form-group">
                     <label>Address:</label>
-                    <InputText @bind-Value="NewPerson.Address" class="form-control"/>
+                    <InputText @bind-Value="_newPerson.Address" class="form-control"/>
                 </div>
 
                 <div class="form-group">
                     <label for="PhoneNumberInput">Phone Number:</label>
                     <InputText id="PhoneNumberInput"
-                               @bind-Value="NewPerson.PhoneNumber"
+                               @bind-Value="_newPerson.PhoneNumber"
                                class="form-control"
                                maxlength="18"
                                placeholder="+998(##)-###-##-##"
@@ -70,7 +80,7 @@
     </div>
 }
 
-@if (Persons != null)
+@if (_persons != null)
 {
     <div class="table-container">
         <table class="table table-striped">
@@ -78,29 +88,21 @@
             <tr>
                 <th>ID</th>
                 <th>Full Name</th>
-                <th>Passport Seria</th>
-                <th>Passport Number</th>
-                <th>Gender</th>
-                <th>Address</th>
                 <th>Phone Number</th>
                 <th>Actions</th>
             </tr>
             </thead>
             <tbody>
-            @foreach (var person in Persons)
+            @foreach (var person in _persons)
             {
                 <tr>
                     <td>@person.Id</td>
                     <td>@person.FullName</td>
-                    <td>@person.PassportSeria</td>
-                    <td>@person.PassportNumber</td>
-                    <td>@person.Gender</td>
-                    <td>@person.Address</td>
                     <td>@person.PhoneNumber</td>
                     <MudTd>
-                        <button class="btn @((SelectedPerson == person) ? "btn-secondary" : "btn-info")"
+                        <button class="btn @((_selectedPerson == person) ? "btn-secondary" : "btn-info")"
                                 @onclick="() => LoadDetails(person)">
-                            @((SelectedPerson == person) ? "Hide Details" : "View Details")
+                            @((_selectedPerson == person) ? "Hide Details" : "View Details")
                         </button>
                         <button class="btn btn-danger" @onclick="() => DeletePerson(person.Id)">Delete</button>
                         @* <button class="btn btn-danger" @onclick="() => DeletePetition(petition.Id)">Delete</button> *@
@@ -108,17 +110,27 @@
                 </tr>
 
 
-                @if (SelectedPerson == person)
+                @if (_selectedPerson == person)
                 {
                     <tr>
                         <td colspan="6">
                             <h4>Details</h4>
                             <p><strong>Photo:</strong></p>
-                            @if (!string.IsNullOrEmpty(PersonPhoto))
+                            @if (!string.IsNullOrEmpty(_personPhoto))
                             {
-                                <img src="@PersonPhoto" alt="Photo"
+                                <img src="@_personPhoto" alt="Photo"
                                      style="width: 150px; height: 150px; object-fit: cover;"/>
-                                @if (string.IsNullOrEmpty(PersonPhoto))
+                                <div class="btn-group">
+                                    <tr>
+                                        <button class="btn btn-danger material-icons" @onclick="() => DeletePhoto(person.Id, person)">
+                                            delete
+                                        </button>
+                                        <button class="btn btn-success" @onclick="() => DeletePhoto(person.Id, person)">
+                                            Insert photo
+                                        </button>
+                                    </tr>
+                                </div>
+                                @if (string.IsNullOrEmpty(_personPhoto))
                                 {
                                     <p>Photo path is null or empty.</p>
                                 }
@@ -128,17 +140,57 @@
                                 <p>No Photo Available</p>
                             }
 
+                            <div class="form-group d-flex">
+                                <div class="flex-fill pr-3">
+                                    <label>Address</label>
+                                    <span class="form-control">@person.Address</span>
+                                </div>
+                                <div class="flex-fill pl-3">
+                                    <label>Phone Number</label>
+                                    <span class="form-control">@person.PhoneNumber</span>
+                                </div>
+                            </div>
+                            <div class="form-group d-flex">
+                                <div class="flex-fill pr-3">
+                                    <label>Passport Series</label>
+                                    <span class="form-control">@person.PassportSeria</span>
+                                </div>
+                                <div class="flex-fill px-3">
+                                    <label>Passport Number</label>
+                                    <span class="form-control">@person.PassportNumber</span>
+                                </div>
+                                <div class="flex-fill pl-3">
+                                    <label>Gender</label>
+                                    <span class="form-control">@person.Gender</span>
+                                </div>
+                            </div>
+
                             <h4>Petitions</h4>
                             <ul>
-                                @if (Petitions != null && Petitions.Any())
+                                @*     Letter: @petition.Letter (Date: @petition.ApplicationDate.ToShortDateString()) *@
+                                @if (_petitions != null && _petitions.Any())
                                 {
-                                    @foreach (var petition in Petitions)
-                                    {
-                                        <li>Allowance
-                                            type: @petition.Allowance |
-                                            Letter: @petition.Letter (Date: @petition.ApplicationDate.ToShortDateString())
-                                        </li>
-                                    }
+                                    <div class="table-container">
+                                        <table class="table table-striped">
+                                            <thead>
+                                            <tr>
+                                                <th>Allowance</th>
+                                                <th>Letter</th>
+                                                <th>Application Date</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            @foreach (var petition in _petitions)
+                                            {
+                                                <tr>
+                                                    <td>@petition.Allowance</td>
+                                                    <td>@petition.Letter</td>
+                                                    <td>@petition.ApplicationDate.ToShortDateString()</td>
+                                                </tr>
+                                            }
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 }
                                 else
                                 {
@@ -148,80 +200,6 @@
                         </td>
                     </tr>
                 }
-
-                #region Mud
-
-                @* <MudCard Class="my-2" Style="position:relative;"> *@
-                @*     @if (SelectedPerson == person) *@
-                @*     { *@
-                @*         <MudCardMedia Image="@PersonPhoto"  Height="200"/> *@
-                @*         //<img src="@PersonPhoto" alt="Photo" *@
-                @*
-                @*              $1$                      style="width: 150px; height: 150px; object-fit: cover;"/>#1# *@
-                @*     } *@
-                @* </MudCard> *@
-
-                #endregion
-                
-                #region MyRegion
-
-                @* @if (SelectedPerson != null) *@
-                @* { *@
-                @*     <div class="form-overlay"> *@
-                @*         <div class="form-container"> *@
-                @*             <h4>Person Details</h4> *@
-                @*              *@
-                @*                 <div> *@
-                @*                     <p><strong>Photo:</strong></p> *@
-                @*                     @if (!string.IsNullOrEmpty(PersonPhoto)) *@
-                @*                     { *@
-                @*                         <img src="@PersonPhoto" alt="Photo" *@
-                @*                              style="width: 150px; height: 150px; object-fit: cover;"/> *@
-                @*                     } *@
-                @*                     else *@
-                @*                     { *@
-                @*                         <p>No Photo Available</p> *@
-                @*                     } *@
-                @*                 </div> *@
-                @*             <div class="form-group"> *@
-                @*                  *@
-                @*                 <label>Full Name:</label> <div>@SelectedPerson.FullName</div> *@
-                @*                 <p><strong>Gender:</strong> @SelectedPerson.Gender</p> *@
-                @*                 <p><strong>Passport Series:</strong> @SelectedPerson.PassportSeria</p> *@
-                @*                 <p><strong>Passport Number:</strong> @SelectedPerson.PassportNumber</p> *@
-                @*                 <p><strong>Address:</strong> @SelectedPerson.Address</p> *@
-                @*                 <p><strong>Phone Number:</strong> @SelectedPerson.PhoneNumber</p> *@
-                @* *@
-                @*             </div> *@
-                @* *@
-                @*             <div class="form-group"> *@
-                @*                 <h4>Petitions</h4> *@
-                @*                 <ul> *@
-                @*                     @if (Petitions != null && Petitions.Any()) *@
-                @*                     { *@
-                @*                         @foreach (var petition in Petitions) *@
-                @*                         { *@
-                @*                             <li>Allowance *@
-                @*                                 type: @petition.Allowance | *@
-                @*                                 Letter: @petition.Letter (Date: @petition.ApplicationDate.ToShortDateString()) *@
-                @*                             </li> *@
-                @*                         } *@
-                @*                     } *@
-                @*                     else *@
-                @*                     { *@
-                @*                         <li>No Petitions Found</li> *@
-                @*                     } *@
-                @*                 </ul> *@
-                @*             </div> *@
-                @* *@
-                @*             <div class="form-buttons"> *@
-                @*                 <button class="btn btn-secondary" @onclick="() => SelectedPerson = null">Close</button> *@
-                @*             </div> *@
-                @*         </div> *@
-                @*     </div> *@
-                @* } *@
-
-                #endregion
             }
             </tbody>
         </table>
@@ -233,13 +211,13 @@ else
 }
 
 @code {
-    private List<Person> Persons;
-    private List<Petition> Petitions;
-    private Person NewPerson = new();
-    private bool IsAdding = false;
-    private Person SelectedPerson;
-    private IBrowserFile UploadedPhoto;
-    private string PersonPhoto;
+    private List<PersonDto>? _persons;
+    private List<PetitionDto>? _petitions;
+    private PersonDto _newPerson = new();
+    private bool _isAdding = false;
+    private PersonDto? _selectedPerson;
+    private IBrowserFile? _uploadedPhoto;
+    private string? _personPhoto;
 
     protected override async Task OnInitializedAsync()
     {
@@ -248,24 +226,24 @@ else
 
     private async Task LoadPersons()
     {
-        Persons = await Http.GetFromJsonAsync<List<Person>>("/Persons");
+        _persons = await Http.GetFromJsonAsync<List<PersonDto>>("/Persons");
     }
 
-    private async Task LoadDetails(Person person)
+    private async Task LoadDetails(PersonDto? person)
     {
-        if (SelectedPerson == person)
+        if (_selectedPerson == person)
         {
-            SelectedPerson = null;
-            Petitions = null;
-            PersonPhoto = null;
+            _selectedPerson = null;
+            _petitions = null;
+            _personPhoto = null;
         }
         else
         {
-            SelectedPerson = person;
+            _selectedPerson = person;
 
-            Petitions = await LoadPetitionsAsync(person.Id);
+            _petitions = await LoadPetitionsAsync(person.Id);
 
-            PersonPhoto = await GetPersonsPhotoAsync(person.Id);
+            _personPhoto = await GetPersonsPhotoAsync(person.Id);
             //PersonPhoto = string.IsNullOrEmpty(photoPath) ? null : $"{photoPath}";
         }
     }
@@ -282,21 +260,21 @@ else
             if (value.Length >= 1)
             {
                 var formattedValue = $"+998({value.Substring(0, 2)}){value.Substring(2, 3)}-{value.Substring(5, 2)}-{value.Substring(7, 2)}";
-                NewPerson.PhoneNumber = formattedValue;
+                _newPerson.PhoneNumber = formattedValue;
             }
             else
             {
-                NewPerson.PhoneNumber = value;
+                _newPerson.PhoneNumber = value;
             }
         }
     }
 
-    private async Task<List<Petition>> LoadPetitionsAsync(int personId)
+    private async Task<List<PetitionDto>?> LoadPetitionsAsync(int personId)
     {
-        return await Http.GetFromJsonAsync<List<Petition>>($"/Petitions/GetPersonPetitions?personId={personId}");
+        return await Http.GetFromJsonAsync<List<PetitionDto>>($"/Petitions/GetPersonPetitions?personId={personId}");
     }
 
-    private async Task<string> GetPersonsPhotoAsync(int personId)
+    private async Task<string?> GetPersonsPhotoAsync(int personId)
     {
         var imageBytes = await Http.GetByteArrayAsync($"/Photos/GetPersonPhoto?personId={personId}");
         var base64String = Convert.ToBase64String(imageBytes);
@@ -309,36 +287,48 @@ else
         await LoadPersons();
     }
 
-    private void ToggleAddForm()
+    private async Task DeletePhoto(int personId, PersonDto? person)
     {
-        IsAdding = !IsAdding;
+        await Http.DeleteAsync($"/Photos/DeletePhotoFromPersonAsync?personId={personId}");
+        await LoadDetails(person);
     }
 
+    private void ToggleAddForm()
+    {
+        _isAdding = !_isAdding;
+    }
+
+    private void NavigateToPersonInfo(int id)
+    {
+        NavigationManager.NavigateTo($"/personinfo/{id}");
+    }
+
+    
     private async Task AddPerson()
     {
-        var personResponse = await Http.PostAsJsonAsync("/Persons", NewPerson);
+        var personResponse = await Http.PostAsJsonAsync("/Persons", _newPerson);
         if (personResponse.IsSuccessStatusCode)
         {
-            var person = await personResponse.Content.ReadFromJsonAsync<Person>();
+            var person = await personResponse.Content.ReadFromJsonAsync<PersonDto>();
             //Thread.Sleep(1000);
-            if (UploadedPhoto != null)
+            if (_uploadedPhoto != null)
             {
-                await AddPhotoToPerson(person.Id, UploadedPhoto);
+                await AddPhotoToPerson(person.Id, _uploadedPhoto);
             }
 
             await LoadPersons();
         }
 
         ToggleAddForm();
-        NewPerson = new();
+        _newPerson = new();
     }
 
     private void HandlePhotoUpload(InputFileChangeEventArgs e)
     {
-        UploadedPhoto = e.File;
+        _uploadedPhoto = e.File;
     }
 
-    private async Task AddPhotoToPerson(int personId, IBrowserFile file)
+    private async Task AddPhotoToPerson(int personId, IBrowserFile? file)
     {
         if (file == null)
         {
@@ -351,44 +341,5 @@ else
         await Http.PostAsync($"/Photos/AddPhotoToPerson{personId}", content);
     }
 
-    public class Person
-    {
-        public int Id { get; set; }
-        public string FullName { get; set; }
-        public Gender Gender { get; set; }
-        public string PassportSeria { get; set; }
-        public long PassportNumber { get; set; }
-        public string Address { get; set; }
-        public string PhoneNumber { get; set; }
-        public Photo Photo { get; set; }
-    }
-
-    public class Photo
-    {
-        public int Id { get; set; }
-        public int PersonId { get; set; }
-        public string FilePath { get; set; }
-    }
-
-    public enum Gender
-    {
-        Male,
-        Female
-    }
-
-    public class Petition
-    {
-        public int Id { get; set; }
-        public AllowanceType Allowance { get; set; }
-        public int PersonId { get; set; }
-        public string Letter { get; set; }
-        public DateOnly ApplicationDate { get; set; }
-    }
-
-    public enum AllowanceType
-    {
-        Nogironlik,
-        YoshgaDoir
-    }
 
 }

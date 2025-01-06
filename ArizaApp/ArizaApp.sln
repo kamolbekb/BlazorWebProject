@@ -14,6 +14,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nafaqa.DataAccess", "Server
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nafaqa.Core", "Server\Nafaqa.Core\Nafaqa.Core.csproj", "{94FF784A-E880-429C-8AD7-14477FD804F7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common", "Common\Common.csproj", "{80B3EC5B-601D-4733-AD89-1327579C07F0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -47,5 +49,9 @@ Global
 		{94FF784A-E880-429C-8AD7-14477FD804F7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{94FF784A-E880-429C-8AD7-14477FD804F7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{94FF784A-E880-429C-8AD7-14477FD804F7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{80B3EC5B-601D-4733-AD89-1327579C07F0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{80B3EC5B-601D-4733-AD89-1327579C07F0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{80B3EC5B-601D-4733-AD89-1327579C07F0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{80B3EC5B-601D-4733-AD89-1327579C07F0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

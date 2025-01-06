@@ -1,4 +1,5 @@
 @page "/petitions"
+@using Common
 @inject HttpClient Http
 
 <h3>Petitions</h3>
@@ -6,18 +7,18 @@
 <!-- Button to add a new petition -->
 <button class="btn btn-primary" @onclick="ToggleAddForm">Add New Petition</button>
 
-@if (IsAdding && !IsEditing)
+@if (_isAdding && !_isEditing)
 {
     <div class="form-overlay">
         <div class="form-container">
             <h4>Add New Petition</h4>
-            <EditForm Model="NewPetition" OnValidSubmit="AddPetition">
+            <EditForm Model="_newPetition" OnValidSubmit="AddPetition">
                 <DataAnnotationsValidator />
                 <ValidationSummary />
 
                 <div class="form-group">
                     <label>Allowance:</label>
-                    <InputSelect @bind-Value="NewPetition.Allowance" class="form-control">
+                    <InputSelect @bind-Value="_newPetition.Allowance" class="form-control">
                         @foreach (var value in Enum.GetValues<AllowanceType>())
                         {
                             <option value="@value">@value</option>
@@ -27,12 +28,12 @@
 
                 <div class="form-group">
                     <label>Person ID:</label>
-                    <InputNumber @bind-Value="NewPetition.PersonId" class="form-control" />
+                    <InputNumber @bind-Value="_newPetition.PersonId" class="form-control" />
                 </div>
 
                 <div class="form-group">
                     <label>Letter:</label>
-                    <InputText @bind-Value="NewPetition.Letter" class="form-control" />
+                    <InputText @bind-Value="_newPetition.Letter" class="form-control" />
                 </div>
 
                 <div class="form-buttons">
@@ -44,18 +45,18 @@
     </div>
 }
 
-@if (IsEditing)
+@if (_isEditing)
 {
     <div class="form-overlay">
         <div class="form-container">
             <h4>Edit Petition</h4>
-            <EditForm Model="UpdatedPetition" OnValidSubmit="EditPetition">
+            <EditForm Model="_updatedPetition" OnValidSubmit="EditPetition">
                 <DataAnnotationsValidator />
                 <ValidationSummary />
 
                 <div class="form-group">
                     <label>Allowance:</label>
-                    <InputSelect @bind-Value="UpdatedPetition.Allowance" class="form-control">
+                    <InputSelect @bind-Value="_updatedPetition.Allowance" class="form-control">
                         @foreach (var value in Enum.GetValues<AllowanceType>())
                         {
                             <option value="@value">@value</option>
@@ -65,12 +66,12 @@
 
                 <div class="form-group">
                     <label>Person ID:</label>
-                    <InputNumber @bind-Value="UpdatedPetition.PersonId" class="form-control" />
+                    <InputNumber @bind-Value="_updatedPetition.PersonId" class="form-control" />
                 </div>
 
                 <div class="form-group">
                     <label>Letter:</label>
-                    <InputText @bind-Value="UpdatedPetition.Letter" class="form-control" />
+                    <InputText @bind-Value="_updatedPetition.Letter" class="form-control" />
                 </div>
 
                 <div class="form-buttons">
@@ -82,7 +83,7 @@
     </div>
 }
 
-@if (Petitions != null)
+@if (_petitions != null)
 {
     <table class="table table-striped">
         <thead>
@@ -96,7 +97,7 @@
         </tr>
         </thead>
         <tbody>
-        @foreach (var petition in Petitions)
+        @foreach (var petition in _petitions)
         {
             <tr>
                 <td>@petition.Id</td>
@@ -119,11 +120,11 @@ else
 }
 
 @code {
-    private List<Petition> Petitions;
-    private Petition NewPetition = new();
-    private Petition UpdatedPetition = new();
-    private bool IsAdding = false;
-    private bool IsEditing = false;
+    private List<PetitionDto>? _petitions;
+    private PetitionDto _newPetition = new();
+    private PetitionDto _updatedPetition = new();
+    private bool _isAdding = false;
+    private bool _isEditing = false;
 
     protected override async Task OnInitializedAsync()
     {
@@ -132,26 +133,26 @@ else
 
     private async Task LoadPetitions()
     {
-        Petitions = await Http.GetFromJsonAsync<List<Petition>>("Petitions");
+        _petitions = await Http.GetFromJsonAsync<List<PetitionDto>>("Petitions");
     }
 
     private void ToggleAddForm()
     {
-        IsAdding = !IsAdding;
-        IsEditing = false;
+        _isAdding = !_isAdding;
+        _isEditing = false;
     }
 
     private async Task AddPetition()
     {
-        await Http.PostAsJsonAsync("Petitions/api/petitions", NewPetition);
+        await Http.PostAsJsonAsync("Petitions/api/petitions", _newPetition);
         await LoadPetitions();
         ToggleAddForm();
-        NewPetition = new();
+        _newPetition = new();
     }
 
-    private void StartEdit(Petition petition)
+    private void StartEdit(PetitionDto petition)
     {
-        UpdatedPetition = new Petition
+        _updatedPetition = new PetitionDto
         {
             Id = petition.Id,
             Allowance = petition.Allowance,
@@ -159,41 +160,26 @@ else
             Letter = petition.Letter,
             ApplicationDate = petition.ApplicationDate
         };
-        IsEditing = true;
-        IsAdding = false;
+        _isEditing = true;
+        _isAdding = false;
     }
 
     private async Task EditPetition()
     {
-        await Http.PutAsJsonAsync($"Petitions?id={UpdatedPetition.Id}", UpdatedPetition);
+        await Http.PutAsJsonAsync($"Petitions?id={_updatedPetition.Id}", _updatedPetition);
         await LoadPetitions();
         CancelEdit();
     }
 
     private void CancelEdit()
     {
-        IsEditing = false;
-        UpdatedPetition = new();
+        _isEditing = false;
+        _updatedPetition = new();
     }
 
     private async Task DeletePetition(int id)
     {
         await Http.DeleteAsync($"Petitions?id={id}");
         await LoadPetitions();
-    }
-
-    public enum AllowanceType
-    {
-        Nogironlik,
-        YoshgaDoir
-    }
-
-    public class Petition
-    {
-        public int Id { get; set; }
-        public AllowanceType Allowance { get; set; }
-        public int PersonId { get; set; }
-        public string Letter { get; set; }
-        public DateOnly ApplicationDate { get; set; }
     }
 }

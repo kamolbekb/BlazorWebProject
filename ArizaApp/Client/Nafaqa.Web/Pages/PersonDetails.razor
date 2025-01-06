@@ -1,0 +1,155 @@
+@page "/personinfo/{Id}"
+@inherits LayoutComponentBase
+@inject NavigationManager NavigationManager
+@inject HttpClient Http
+
+
+    <tr>
+        <td colspan="6">
+            <h4>Details</h4>
+            <p><strong>Photo:</strong></p>
+            @if (!string.IsNullOrEmpty(_personPhoto))
+            {
+                <img src="@_personPhoto" alt="Photo"
+                     style="width: 150px; height: 150px; object-fit: cover;"/>
+                <div class="btn-group">
+                    <tr>
+                        <button class="btn btn-danger material-icons" @onclick="() => DeletePhoto(Id, Person)">
+                            delete
+                        </button>
+                        <button class="btn btn-success" @onclick="() => DeletePhoto(Id, Person)">
+                            Insert photo
+                        </button>
+                    </tr>
+                </div>
+                @if (string.IsNullOrEmpty(_personPhoto))
+                {
+                    <p>Photo path is null or empty.</p>
+                }
+            }
+            else
+            {
+                <p>No Photo Available</p>
+            }
+
+            <div class="form-group d-flex">
+                <div class="flex-fill pr-3">
+                    <label>Address</label>
+                    <span class="form-control">@Person.Address</span>
+                </div>
+                <div class="flex-fill pl-3">
+                    <label>Phone Number</label>
+                    <span class="form-control">@Person.PhoneNumber</span>
+                </div>
+            </div>
+            <div class="form-group d-flex">
+                <div class="flex-fill pr-3">
+                    <label>Passport Series</label>
+                    <span class="form-control">@Person.PassportSeria</span>
+                </div>
+                <div class="flex-fill px-3">
+                    <label>Passport Number</label>
+                    <span class="form-control">@Person.PassportNumber</span>
+                </div>
+                <div class="flex-fill pl-3">
+                    <label>Gender</label>
+                    <span class="form-control">@Person.Gender</span>
+                </div>
+            </div>
+
+            <h4>Petitions</h4>
+            <ul>
+                @*     Letter: @petition.Letter (Date: @petition.ApplicationDate.ToShortDateString()) *@
+                @if (_petitions != null && _petitions.Any())
+                {
+                    <div class="table-container">
+                        <table class="table table-striped">
+                            <thead>
+                            <tr>
+                                <th>Allowance</th>
+                                <th>Letter</th>
+                                <th>Application Date</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            @foreach (var petition in _petitions)
+                            {
+                                <tr>
+                                    <td>@petition.Allowance</td>
+                                    <td>@petition.Letter</td>
+                                    <td>@petition.ApplicationDate.ToShortDateString()</td>
+                                </tr>
+                            }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <li>No Petitions Found</li>
+                }
+            </ul>
+        </td>
+    </tr>
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private PersonDto? Person { get; set; }
+    private string? PersonPhoto { get; set; }
+    private List<PetitionDto>? _petitions;
+    private bool _isAdding = false;
+    private PersonDto? _selectedPerson;
+    private IBrowserFile? _uploadedPhoto;
+    private string? _personPhoto;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Load person details by Id
+        Person = await Http.GetFromJsonAsync<PersonDto>($"/Persons/GetPersonById?id={Id}");
+
+        if (Person == null)
+        {
+            NavigationManager.NavigateTo("/persons");
+        }
+
+        // Load person's photo
+        PersonPhoto = await GetPersonsPhotoAsync(Id);
+    }
+
+    private async Task LoadDetails(PersonDto? person)
+    {
+        if (_selectedPerson == person)
+        {
+            _selectedPerson = null;
+            _petitions = null;
+            _personPhoto = null;
+        }
+        else
+        {
+            _selectedPerson = person;
+            _petitions = await LoadPetitionsAsync(person.Id);
+            _personPhoto = await GetPersonsPhotoAsync(person.Id);
+        }
+    }
+    
+    private async Task<string?> GetPersonsPhotoAsync(int personId)
+    {
+        var imageBytes = await Http.GetByteArrayAsync($"/Photos/GetPersonPhoto?personId={personId}");
+        var base64String = Convert.ToBase64String(imageBytes);
+        return $"data:image/jpeg;base64,{base64String}";
+    }
+
+    
+    private async Task<List<PetitionDto>?> LoadPetitionsAsync(int personId)
+    {
+        return await Http.GetFromJsonAsync<List<PetitionDto>>($"/Petitions/GetPersonPetitions?personId={personId}");
+    }
+
+    private async Task DeletePhoto(int personId, PersonDto? person)
+    {
+        await Http.DeleteAsync($"/Photos/DeletePhotoFromPersonAsync?personId={personId}");
+        await LoadDetails(person);
+    }
+}

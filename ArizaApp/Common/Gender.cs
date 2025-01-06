@@ -1,4 +1,4 @@
-namespace Nafaqa.Web.Models;
+namespace Common;
 
 public enum Gender
 {

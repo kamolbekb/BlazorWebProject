@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Nafaqa.DataAccess.Persistence.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20241228073614_Initial")]
+    [Migration("20250107102420_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -44,8 +44,9 @@ namespace Nafaqa.DataAccess.Persistence.Migrations
                     b.Property<int>("Gender")
                         .HasColumnType("integer");
 
-                    b.Property<long>("PassportNumber")
-                        .HasColumnType("bigint");
+                    b.Property<string>("PassportNumber")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<string>("PassportSeria")
                         .IsRequired()

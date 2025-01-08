@@ -1,139 +1,270 @@
-@page "/personinfo/{Id}"
+@page "/personinfo/{Id:int}"
+@using System.Net.Http.Headers
 @inherits LayoutComponentBase
 @inject NavigationManager NavigationManager
 @inject HttpClient Http
 
+@if (Person != null)
+{
+    <div class="details-container">
+        <h4>Details</h4>
+        <div class="d-flex align-items-start gap-3">
 
-    <tr>
-        <td colspan="6">
-            <h4>Details</h4>
-            <p><strong>Photo:</strong></p>
-            @if (!string.IsNullOrEmpty(_personPhoto))
-            {
-                <img src="@_personPhoto" alt="Photo"
-                     style="width: 150px; height: 150px; object-fit: cover;"/>
-                <div class="btn-group">
-                    <tr>
-                        <button class="btn btn-danger material-icons" @onclick="() => DeletePhoto(Id, Person)">
-                            delete
-                        </button>
-                        <button class="btn btn-success" @onclick="() => DeletePhoto(Id, Person)">
-                            Insert photo
-                        </button>
-                    </tr>
-                </div>
-                @if (string.IsNullOrEmpty(_personPhoto))
+            <div>
+                @if (!string.IsNullOrEmpty(_personPhoto))
                 {
-                    <p>Photo path is null or empty.</p>
-                }
-            }
-            else
-            {
-                <p>No Photo Available</p>
-            }
-
-            <div class="form-group d-flex">
-                <div class="flex-fill pr-3">
-                    <label>Address</label>
-                    <span class="form-control">@Person.Address</span>
-                </div>
-                <div class="flex-fill pl-3">
-                    <label>Phone Number</label>
-                    <span class="form-control">@Person.PhoneNumber</span>
-                </div>
-            </div>
-            <div class="form-group d-flex">
-                <div class="flex-fill pr-3">
-                    <label>Passport Series</label>
-                    <span class="form-control">@Person.PassportSeria</span>
-                </div>
-                <div class="flex-fill px-3">
-                    <label>Passport Number</label>
-                    <span class="form-control">@Person.PassportNumber</span>
-                </div>
-                <div class="flex-fill pl-3">
-                    <label>Gender</label>
-                    <span class="form-control">@Person.Gender</span>
-                </div>
-            </div>
-
-            <h4>Petitions</h4>
-            <ul>
-                @*     Letter: @petition.Letter (Date: @petition.ApplicationDate.ToShortDateString()) *@
-                @if (_petitions != null && _petitions.Any())
-                {
-                    <div class="table-container">
-                        <table class="table table-striped">
-                            <thead>
-                            <tr>
-                                <th>Allowance</th>
-                                <th>Letter</th>
-                                <th>Application Date</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            @foreach (var petition in _petitions)
-                            {
-                                <tr>
-                                    <td>@petition.Allowance</td>
-                                    <td>@petition.Letter</td>
-                                    <td>@petition.ApplicationDate.ToShortDateString()</td>
-                                </tr>
-                            }
-                            </tbody>
-                        </table>
-                    </div>
+                    <img src="@_personPhoto" alt="Photo"
+                         style="width: 150px; height: 150px; object-fit: cover;"/>
                 }
                 else
                 {
-                    <li>No Petitions Found</li>
+                    <p>No Photo Available</p>
                 }
-            </ul>
-        </td>
-    </tr>
+            </div>
+
+            <div>
+                <tr>
+                    <div class="form-group mb-3">
+                        <label>Upload Photo:</label>
+                        <InputFile OnChange="HandlePhotoUpload"/>
+                    </div>
+                </tr>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-danger material-icons" @onclick="() => DeletePhoto(Id, Person)">
+                        delete
+                    </button>
+                    @* <button type="submit" class="btn btn-success">Set Photo</button> *@
+                    <button class="btn btn-success material-icons"
+                            @onclick="() => AddPhotoToPerson(Id, _uploadedPhoto)">
+                        upload
+                    </button>
+                    <button class="btn btn-success material-icons" @onclick="() => LoadDetails(Person)">
+                        refresh
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group d-flex mt-4">
+            <div class="flex-fill pr-3">
+                <label>Full name</label>
+                <span class="form-control">@Person.FullName</span>
+            </div>
+            <div class="flex-fill px-3">
+                <label>Address</label>
+                <span class="form-control">@Person.Address</span>
+            </div>
+            <div class="flex-fill pl-3">
+                <label>Phone Number</label>
+                <span class="form-control">@Person.PhoneNumber</span>
+            </div>
+        </div>
+        <div class="form-group d-flex">
+            <div class="flex-fill pr-3">
+                <label>Passport Series</label>
+                <span class="form-control">@Person.PassportSeria</span>
+            </div>
+            <div class="flex-fill px-3">
+                <label>Passport Number</label>
+                <span class="form-control">@Person.PassportNumber</span>
+            </div>
+            <div class="flex-fill pl-3">
+                <label>Gender</label>
+                <span class="form-control">@Person.Gender</span>
+            </div>
+        </div>
+
+        <div>
+            <tr>
+                <button class="btn btn-success material-icons" @onclick="() => StartEdit(Person)">
+                    edit
+                </button>
+            </tr>
+        </div>
+        <h4>Petitions</h4>
+        <ul>
+            @if (_petitions != null && _petitions.Any())
+            {
+                <div class="table-container">
+                    <table class="table table-striped">
+                        <thead>
+                        <tr>
+                            <th>Allowance</th>
+                            <th>Letter</th>
+                            <th>Application Date</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        @foreach (var petition in _petitions)
+                        {
+                            <tr>
+                                <td>@petition.Allowance</td>
+                                <td>@petition.Letter</td>
+                                <td>@petition.ApplicationDate.ToShortDateString()</td>
+                            </tr>
+                        }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <li>No Petitions Found</li>
+            }
+        </ul>
+    </div>
+}
+@if (_isEditing)
+{
+    <div class="form-overlay">
+        <div class="form-container">
+            <h4>Edit Person</h4>
+            <EditForm Model="_updatedPerson" OnValidSubmit="EditPerson">
+                <DataAnnotationsValidator/>
+                <ValidationSummary/>
+
+                <div class="form-group">
+                    <label>Full Name:</label>
+                    <InputText @bind-Value="_updatedPerson.FullName" class="form-control"/>
+                </div>
+
+                <div class="form-group">
+                    <label>Gender:</label>
+                    <InputSelect @bind-Value="_updatedPerson.Gender" class="form-control">
+                        @foreach (var value in Enum.GetValues<Gender>())
+                        {
+                            <option value="@value">@value</option>
+                        }
+                    </InputSelect>
+                </div>
+
+                <div class="form-group">
+                    <label>Passport Series:</label>
+                    <InputText @bind-Value="_updatedPerson.PassportSeria"
+                               class="text-uppercase form-control"
+                               maxlength="2"
+                               Placeholder="XX"
+                               @oninput="(e) => _updatedPerson.PassportSeria = e.Value
+                                   .ToString().ToUpper()"/>
+                </div>
+
+                <div class="form-group">
+                    <label for="passportNumber">Passport Number:</label>
+                    <InputText @bind-Value="_updatedPerson.PassportNumber"
+                               id="passportNumber"
+                               type="text"
+                               class="form-control"
+                               inputmode="numeric"
+                               pattern="[0-9]{7}"
+                               autocomplete="off"
+                               maxlength="7"
+                               onkeypress="return event.charCode >= 48 && event.charCode <= 57"
+                               placeholder="1234567"/>
+                </div>
+
+                <div class="form-group">
+                    <label>Address:</label>
+                    <InputText @bind-Value="_updatedPerson.Address" class="form-control"/>
+                </div>
+
+                <div class="form-group">
+                    <label for="PhoneNumberInput">Phone Number:</label>
+                    <InputText id="PhoneNumberInput"
+                               @bind-Value="_updatedPerson.PhoneNumber"
+                               class="form-control"
+                               maxlength="18"
+                               placeholder="+998(##)-###-##-##"
+                               @oninput="HandleInputChange"/>
+                </div>
+
+                <div class="form-buttons">
+                    <button type="submit" class="btn btn-success">Submit</button>
+                    <button type="button" class="btn btn-secondary" @onclick="CancelEdit">Cancel</button>
+                </div>
+            </EditForm>
+        </div>
+    </div>
+}
+
+
 
 @code {
-    [Parameter]
-    public int Id { get; set; }
+    [Parameter] public int Id { get; set; }
 
     private PersonDto? Person { get; set; }
-    private string? PersonPhoto { get; set; }
     private List<PetitionDto>? _petitions;
-    private bool _isAdding = false;
-    private PersonDto? _selectedPerson;
+    private PersonDto _updatedPerson = new();
     private IBrowserFile? _uploadedPhoto;
     private string? _personPhoto;
+    private bool _isEditing = false;
 
     protected override async Task OnInitializedAsync()
     {
-        // Load person details by Id
         Person = await Http.GetFromJsonAsync<PersonDto>($"/Persons/GetPersonById?id={Id}");
-
         if (Person == null)
         {
-            NavigationManager.NavigateTo("/persons");
+            throw new ArgumentNullException();
         }
 
-        // Load person's photo
-        PersonPhoto = await GetPersonsPhotoAsync(Id);
+        await LoadDetails(Person);
     }
 
-    private async Task LoadDetails(PersonDto? person)
+    public void HandleInputChange(ChangeEventArgs e)
     {
-        if (_selectedPerson == person)
+        var value = e.Value?.ToString();
+        if (!string.IsNullOrEmpty(value))
         {
-            _selectedPerson = null;
-            _petitions = null;
-            _personPhoto = null;
-        }
-        else
-        {
-            _selectedPerson = person;
-            _petitions = await LoadPetitionsAsync(person.Id);
-            _personPhoto = await GetPersonsPhotoAsync(person.Id);
+            // Remove all non-numeric characters
+            value = new string(value.Where(char.IsDigit).ToArray());
+
+            // Apply mask if value length is at least 10
+            if (value.Length >= 1)
+            {
+                var formattedValue = $"+998({value.Substring(0, 2)}){value.Substring(2, 3)}-{value.Substring(5, 2)}-{value.Substring(7, 2)}";
+                _updatedPerson.PhoneNumber = formattedValue;
+            }
+            else
+            {
+                _updatedPerson.PhoneNumber = value;
+            }
         }
     }
-    
+
+    private void StartEdit(PersonDto person)
+    {
+        _updatedPerson = new PersonDto
+        {
+            Id = person.Id,
+            FullName = person.FullName,
+            Address = person.Address,
+            PhoneNumber = person.PhoneNumber,
+            PassportSeria = person.PassportSeria,
+            PassportNumber = person.PassportNumber,
+            Gender = person.Gender
+        };
+        _isEditing = true;
+    }
+
+    private async Task EditPerson()
+    {
+        await Http.PutAsJsonAsync($"/Persons?id={_updatedPerson.Id}", _updatedPerson);
+        Person = await Http.GetFromJsonAsync<PersonDto>($"/Persons/GetPersonById?id={Id}");
+        await LoadDetails(Person);
+        CancelEdit();
+    }
+
+    private void CancelEdit()
+    {
+        _isEditing = false;
+        _updatedPerson = new();
+    }
+
+    private async Task LoadDetails(PersonDto personDto)
+    {
+        _petitions = await LoadPetitionsAsync(personDto.Id);
+        _personPhoto = await GetPersonsPhotoAsync(personDto.Id);
+    }
+
     private async Task<string?> GetPersonsPhotoAsync(int personId)
     {
         var imageBytes = await Http.GetByteArrayAsync($"/Photos/GetPersonPhoto?personId={personId}");
@@ -141,7 +272,11 @@
         return $"data:image/jpeg;base64,{base64String}";
     }
 
-    
+    private void HandlePhotoUpload(InputFileChangeEventArgs e)
+    {
+        _uploadedPhoto = e.File;
+    }
+
     private async Task<List<PetitionDto>?> LoadPetitionsAsync(int personId)
     {
         return await Http.GetFromJsonAsync<List<PetitionDto>>($"/Petitions/GetPersonPetitions?personId={personId}");
@@ -152,4 +287,29 @@
         await Http.DeleteAsync($"/Photos/DeletePhotoFromPersonAsync?personId={personId}");
         await LoadDetails(person);
     }
+
+    private async Task AddPhotoToPerson(int personId, IBrowserFile? file)
+    {
+        if (file == null)
+        {
+            throw new ArgumentException("Invalid file.");
+        }
+
+        var content = new MultipartFormDataContent();
+        var streamContent = new StreamContent(file.OpenReadStream(maxAllowedSize: 10 * 1024 * 1024));
+        streamContent.Headers.ContentType = new MediaTypeHeaderValue(file.ContentType);
+
+        content.Add(streamContent, "file", file.Name);
+
+        try
+        {
+            var response = await Http.PostAsync($"/Photos/AddPhotoToPerson{personId}", content);
+            response.EnsureSuccessStatusCode();
+        }
+        catch (HttpRequestException ex)
+        {
+            Console.WriteLine($"Error uploading photo: {ex.Message}");
+        }
+    }
+
 }

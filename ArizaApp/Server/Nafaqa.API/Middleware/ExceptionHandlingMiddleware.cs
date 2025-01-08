@@ -2,6 +2,7 @@
 using Nafaqa.Application.Models;
 using Nafaqa.Core.Exceptions;
 using Newtonsoft.Json;
+
 namespace Nafaqa.API.Middleware;
 
 public class ExceptionHandlingMiddleware

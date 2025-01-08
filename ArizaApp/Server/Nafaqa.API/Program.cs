@@ -23,6 +23,11 @@ builder.Services.AddValidatorsFromAssemblyContaining(typeof(IValidationsMarker))
 builder.Services.AddDbContext<DbContext>(options =>
     options.UseNpgsql("ConnectionString"));
 
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.Limits.MaxRequestBodySize = 10 * 1024 * 1024; //10 MB
+});
+
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddLogging();

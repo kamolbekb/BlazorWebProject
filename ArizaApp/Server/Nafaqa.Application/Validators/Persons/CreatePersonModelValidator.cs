@@ -19,6 +19,7 @@ public class CreatePersonModelValidator : AbstractValidator<CreatePersonModel>
             .NotEmpty();
         
         RuleFor(person => person.PassportNumber)
+            .MaximumLength(10)
             .NotEmpty();
     }
 }

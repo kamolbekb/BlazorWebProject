@@ -72,8 +72,10 @@ public class PersonService : IPersonService
                 Errors = new List<string> { "You are trying to Update a Person that doesn't exist" }
             };
         }
-
-        await _personRepository.UpdateAsync(_mapper.Map<Person>(entity));
+        
+        _mapper.Map(updatePersonModel, entity);
+        
+        await _personRepository.UpdateAsync(entity);
         await _personRepository.SaveChangesAsync();
 
         return new BaseResponseModel<int>

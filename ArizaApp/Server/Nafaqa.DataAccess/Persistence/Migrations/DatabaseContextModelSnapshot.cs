@@ -42,8 +42,9 @@ namespace Nafaqa.DataAccess.Persistence.Migrations
                     b.Property<int>("Gender")
                         .HasColumnType("integer");
 
-                    b.Property<long>("PassportNumber")
-                        .HasColumnType("bigint");
+                    b.Property<string>("PassportNumber")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<string>("PassportSeria")
                         .IsRequired()

@@ -1,4 +1,5 @@
 @page "/persons"
+@using System.Net.Http.Headers
 @using Gender = Common.Gender
 @inject HttpClient Http
 @inherits LayoutComponentBase
@@ -7,7 +8,6 @@
 
 <h3>Persons</h3>
 
-<!-- Button to add a new person -->
 <button class="btn btn-primary" @onclick="ToggleAddForm">Add New Person</button>
 
 @if (_isAdding)
@@ -41,14 +41,21 @@
                                maxlength="2"
                                Placeholder="XX"
                                @oninput="(e) => _newPerson.PassportSeria = e.Value
-                               .ToString().ToUpper()"/>
+                                   .ToString().ToUpper()"/>
                 </div>
 
                 <div class="form-group">
-                    <label>Passport Number:</label>
-                    <InputNumber @bind-Value="_newPerson.PassportNumber"
-                                 class="form-control"
-                                 Placeholder="12345"/>
+                    <label for="passportNumber">Passport Number:</label>
+                    <InputText @bind-Value="_newPerson.PassportNumber"
+                               id="passportNumber"
+                               type="text"
+                               class="form-control"
+                               inputmode="numeric"
+                               pattern="[0-9]{7}"
+                               autocomplete="off"
+                               maxlength="7"
+                               onkeypress="return event.charCode >= 48 && event.charCode <= 57"
+                               placeholder="1234567"/>
                 </div>
 
                 <div class="form-group">
@@ -100,106 +107,12 @@
                     <td>@person.FullName</td>
                     <td>@person.PhoneNumber</td>
                     <MudTd>
-                        <button class="btn @((_selectedPerson == person) ? "btn-secondary" : "btn-info")"
-                                @onclick="() => LoadDetails(person)">
-                            @((_selectedPerson == person) ? "Hide Details" : "View Details")
+                        <button class="btn btn-info">
+                            <a href="@($"/personinfo/{person.Id}")" class="text-white text-decoration-none">View Details</a>
                         </button>
                         <button class="btn btn-danger" @onclick="() => DeletePerson(person.Id)">Delete</button>
-                        @* <button class="btn btn-danger" @onclick="() => DeletePetition(petition.Id)">Delete</button> *@
                     </MudTd>
                 </tr>
-
-
-                @if (_selectedPerson == person)
-                {
-                    <tr>
-                        <td colspan="6">
-                            <h4>Details</h4>
-                            <p><strong>Photo:</strong></p>
-                            @if (!string.IsNullOrEmpty(_personPhoto))
-                            {
-                                <img src="@_personPhoto" alt="Photo"
-                                     style="width: 150px; height: 150px; object-fit: cover;"/>
-                                <div class="btn-group">
-                                    <tr>
-                                        <button class="btn btn-danger material-icons" @onclick="() => DeletePhoto(person.Id, person)">
-                                            delete
-                                        </button>
-                                        <button class="btn btn-success" @onclick="() => DeletePhoto(person.Id, person)">
-                                            Insert photo
-                                        </button>
-                                    </tr>
-                                </div>
-                                @if (string.IsNullOrEmpty(_personPhoto))
-                                {
-                                    <p>Photo path is null or empty.</p>
-                                }
-                            }
-                            else
-                            {
-                                <p>No Photo Available</p>
-                            }
-
-                            <div class="form-group d-flex">
-                                <div class="flex-fill pr-3">
-                                    <label>Address</label>
-                                    <span class="form-control">@person.Address</span>
-                                </div>
-                                <div class="flex-fill pl-3">
-                                    <label>Phone Number</label>
-                                    <span class="form-control">@person.PhoneNumber</span>
-                                </div>
-                            </div>
-                            <div class="form-group d-flex">
-                                <div class="flex-fill pr-3">
-                                    <label>Passport Series</label>
-                                    <span class="form-control">@person.PassportSeria</span>
-                                </div>
-                                <div class="flex-fill px-3">
-                                    <label>Passport Number</label>
-                                    <span class="form-control">@person.PassportNumber</span>
-                                </div>
-                                <div class="flex-fill pl-3">
-                                    <label>Gender</label>
-                                    <span class="form-control">@person.Gender</span>
-                                </div>
-                            </div>
-
-                            <h4>Petitions</h4>
-                            <ul>
-                                @*     Letter: @petition.Letter (Date: @petition.ApplicationDate.ToShortDateString()) *@
-                                @if (_petitions != null && _petitions.Any())
-                                {
-                                    <div class="table-container">
-                                        <table class="table table-striped">
-                                            <thead>
-                                            <tr>
-                                                <th>Allowance</th>
-                                                <th>Letter</th>
-                                                <th>Application Date</th>
-                                            </tr>
-                                            </thead>
-                                            <tbody>
-                                            @foreach (var petition in _petitions)
-                                            {
-                                                <tr>
-                                                    <td>@petition.Allowance</td>
-                                                    <td>@petition.Letter</td>
-                                                    <td>@petition.ApplicationDate.ToShortDateString()</td>
-                                                </tr>
-                                            }
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                }
-                                else
-                                {
-                                    <li>No Petitions Found</li>
-                                }
-                            </ul>
-                        </td>
-                    </tr>
-                }
             }
             </tbody>
         </table>
@@ -229,26 +142,7 @@ else
         _persons = await Http.GetFromJsonAsync<List<PersonDto>>("/Persons");
     }
 
-    private async Task LoadDetails(PersonDto? person)
-    {
-        if (_selectedPerson == person)
-        {
-            _selectedPerson = null;
-            _petitions = null;
-            _personPhoto = null;
-        }
-        else
-        {
-            _selectedPerson = person;
-
-            _petitions = await LoadPetitionsAsync(person.Id);
-
-            _personPhoto = await GetPersonsPhotoAsync(person.Id);
-            //PersonPhoto = string.IsNullOrEmpty(photoPath) ? null : $"{photoPath}";
-        }
-    }
-
-    private void HandleInputChange(ChangeEventArgs e)
+    public void HandleInputChange(ChangeEventArgs e)
     {
         var value = e.Value?.ToString();
         if (!string.IsNullOrEmpty(value))
@@ -287,12 +181,6 @@ else
         await LoadPersons();
     }
 
-    private async Task DeletePhoto(int personId, PersonDto? person)
-    {
-        await Http.DeleteAsync($"/Photos/DeletePhotoFromPersonAsync?personId={personId}");
-        await LoadDetails(person);
-    }
-
     private void ToggleAddForm()
     {
         _isAdding = !_isAdding;
@@ -303,7 +191,7 @@ else
         NavigationManager.NavigateTo($"/personinfo/{id}");
     }
 
-    
+
     private async Task AddPerson()
     {
         var personResponse = await Http.PostAsJsonAsync("/Persons", _newPerson);
@@ -336,9 +224,20 @@ else
         }
 
         var content = new MultipartFormDataContent();
+        var streamContent = new StreamContent(file.OpenReadStream(maxAllowedSize: 10 * 1024 * 1024));
+        streamContent.Headers.ContentType = new MediaTypeHeaderValue(file.ContentType);
 
-        content.Add(new StreamContent(file.OpenReadStream()), "file", file.Name);
-        await Http.PostAsync($"/Photos/AddPhotoToPerson{personId}", content);
+        content.Add(streamContent, "file", file.Name);
+
+        try
+        {
+            var response = await Http.PostAsync($"/Photos/AddPhotoToPerson{personId}", content);
+            response.EnsureSuccessStatusCode();
+        }
+        catch (HttpRequestException ex)
+        {
+            Console.WriteLine($"Error uploading photo: {ex.Message}");
+        }
     }
 
 

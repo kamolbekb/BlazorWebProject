@@ -1,4 +1,5 @@
 @page "/petitions"
+@using System.Collections
 @using Common
 @inject HttpClient Http
 
@@ -26,10 +27,19 @@
                     </InputSelect>
                 </div>
 
-                <div class="form-group">
-                    <label>Person ID:</label>
-                    <InputNumber @bind-Value="_newPetition.PersonId" class="form-control" />
-                </div>
+                <InputSelect @bind-Value="_newPetition.PersonId" class="form-control">
+                    @if (_persons != null)
+                    {
+                        @foreach (var person in _persons)
+                        {
+                            <option value="@person.Id">@person.FullName @person.PassportSeria @person.PassportNumber</option>
+                        }
+                    }
+                    else
+                    {
+                        <option value="">Loading...</option>
+                    }
+                </InputSelect>
 
                 <div class="form-group">
                     <label>Letter:</label>
@@ -64,10 +74,19 @@
                     </InputSelect>
                 </div>
 
-                <div class="form-group">
-                    <label>Person ID:</label>
-                    <InputNumber @bind-Value="_updatedPetition.PersonId" class="form-control" />
-                </div>
+                <InputSelect @bind-Value="_updatedPetition.PersonId" class="form-control">
+                    @if (_persons != null)
+                    {
+                        @foreach (var person in _persons)
+                        {
+                            <option value="@person.Id">@person.FullName @person.PassportSeria @person.PassportNumber</option>
+                        }
+                    }
+                    else
+                    {
+                        <option value="">Loading...</option>
+                    }
+                </InputSelect>
 
                 <div class="form-group">
                     <label>Letter:</label>
@@ -122,6 +141,7 @@ else
 @code {
     private List<PetitionDto>? _petitions;
     private PetitionDto _newPetition = new();
+    private List<PersonDto>? _persons;
     private PetitionDto _updatedPetition = new();
     private bool _isAdding = false;
     private bool _isEditing = false;
@@ -129,8 +149,14 @@ else
     protected override async Task OnInitializedAsync()
     {
         await LoadPetitions();
+        await LoadPersons();
     }
 
+    private async Task LoadPersons()
+    {
+        _persons = await Http.GetFromJsonAsync<List<PersonDto>>("/Persons");
+    }
+    
     private async Task LoadPetitions()
     {
         _petitions = await Http.GetFromJsonAsync<List<PetitionDto>>("Petitions");

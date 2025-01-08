@@ -19,7 +19,7 @@ namespace Nafaqa.DataAccess.Persistence.Migrations
                     FullName = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
                     Gender = table.Column<int>(type: "integer", nullable: false),
                     PassportSeria = table.Column<string>(type: "character varying(10)", maxLength: 10, nullable: false),
-                    PassportNumber = table.Column<long>(type: "bigint", nullable: false),
+                    PassportNumber = table.Column<string>(type: "text", nullable: false),
                     Address = table.Column<string>(type: "text", nullable: false),
                     PhoneNumber = table.Column<string>(type: "text", nullable: false)
                 },

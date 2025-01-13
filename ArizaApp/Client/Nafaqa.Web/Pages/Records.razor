@@ -1,7 +1,8 @@
 @page "/petitions"
-@using MudBlazor
+@using Nafaqa.Web.Shared
 @inject HttpClient Http
 @inject IDialogService DialogService
+@inject ISnackbar Snackbar
 
 <h3 class="text-2xl font-bold mb-4 text-gray-100">Petitions</h3>
 
@@ -116,10 +117,9 @@
 
 @if (_petitions != null)
 {
-    <div class="overflow-x-auto">
-        <table class="table-auto w-full bg-gray-800 border-collapse border border-gray-700 text-gray-100">
-            <thead>
-            <tr class="bg-gray-900">
+    <PaginationComponent TItem="PetitionDto" Items="_petitions" DefaultPageSize="5">
+        <ChildContentHeader>
+            <tr>
                 <th class="border border-gray-700 px-4 py-2">ID</th>
                 <th class="border border-gray-700 px-4 py-2">Allowance</th>
                 <th class="border border-gray-700 px-4 py-2">Person</th>
@@ -128,32 +128,31 @@
                 <th class="border border-gray-700 px-4 py-2">Application Date</th>
                 <th class="border border-gray-700 px-4 py-2">Actions</th>
             </tr>
-            </thead>
-            <tbody>
-            @foreach (var petition in _petitions)
-            {
-                <tr class="hover:bg-gray-700">
-                    <td class="border border-gray-700 px-4 py-2">@petition.Id</td>
-                    <td class="border border-gray-700 px-4 py-2">@petition.Allowance</td>
-                    <td class="border border-gray-700 px-4 py-2">@(_persons?.FirstOrDefault(p => p.Id == petition.PersonId)?.FullName ?? "Unknown")</td>
-                    <td class="border border-gray-700 px-4 py-2">@(_persons?.FirstOrDefault(p => p.Id == petition.PersonId)?.PassportSeria ?? "Unknown")
-                        @(_persons?.FirstOrDefault(p => p.Id == petition.PersonId)?.PassportNumber ?? "Unknown")</td>
-                    <td class="border border-gray-700 px-4 py-2">@petition.Letter</td>
-                    <td class="border border-gray-700 px-4 py-2">@petition.ApplicationDate.ToShortDateString()</td>
-                    <td class="border border-gray-700 px-4 py-2">
-                        <button class="btn btn-outline-success material-icons" @onclick="() => StartEdit(petition)">
-                            edit
-                        </button>
-                        <button class="btn btn-outline-danger material-icons"
-                                @onclick="() => DeletePetition(petition.Id)">delete
-                        </button>
-                    </td>
-                </tr>
-            }
-            </tbody>
-        </table>
-    </div>
+        </ChildContentHeader>
+        <ChildContentRow Context="petition">
+            <tr class="hover:bg-gray-700 text-white">
+                <td class="border border-gray-700 px-4 py-2">@petition.Id</td>
+                <td class="border border-gray-700 px-4 py-2">@petition.Allowance</td>
+                <td class="border border-gray-700 px-4 py-2">@(_persons?.FirstOrDefault(p => p.Id == petition.PersonId)?.FullName ?? "Unknown")</td>
+                <td class="border border-gray-700 px-4 py-2">
+                    @(_persons?.FirstOrDefault(p => p.Id == petition.PersonId)?.PassportSeria ?? "Unknown") 
+                    @(_persons?.FirstOrDefault(p => p.Id == petition.PersonId)?.PassportNumber ?? "Unknown")
+                </td>
+                <td class="border border-gray-700 px-4 py-2">@petition.Letter</td>
+                <td class="border border-gray-700 px-4 py-2">@petition.ApplicationDate.ToShortDateString()</td>
+                <td class="border border-gray-700 px-4 py-2">
+                    <button class="btn btn-outline-success material-icons" @onclick="() => StartEdit(petition)">
+                        edit
+                    </button>
+                    <button class="btn btn-outline-danger material-icons" @onclick="() => DeletePetition(petition.Id)">
+                        delete
+                    </button>
+                </td>
+            </tr>
+        </ChildContentRow>
+    </PaginationComponent>
 }
+
 else
 {
     <p class="text-center mt-4 text-gray-100">Loading...</p>
@@ -203,23 +202,17 @@ else
         background-color: #4a4a4c;
     }
 
-    .btn-outline-primary {
-        border: 1px solid #0a84ff;
-        color: #0a84ff;
-        background-color: transparent;
-    }
-
-    .btn-outline-primary:hover {
-        background-color: #0a84ff;
-        color: #fff;
-    }
-
     .btn-outline-danger {
         border: 1px solid #ff453a;
         color: #ff453a;
         background-color: transparent;
     }
 
+    .btn-outline-success {
+        border: 2px solid #006400;
+        color: #228B22;
+        background-color: transparent;
+    }
     .btn-outline-danger:hover {
         background-color: #ff453a;
         color: #fff;
@@ -240,13 +233,6 @@ else
         border-color: #0a84ff;
         box-shadow: 0 0 0 2px rgba(10, 132, 255, 0.3);
     }
-
-    /* Table Styles */
-    .table-auto {
-        width: 100%;
-        border-collapse: collapse;
-    }
-
     .table-auto th,
     .table-auto td {
         padding: 12px;
@@ -291,26 +277,6 @@ else
         margin-bottom: 16px;
     }
 
-    /* Popup Styles */
-    .popup-overlay {
-        position: fixed;
-        inset: 0;
-        background-color: rgba(0, 0, 0, 0.5);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 1000;
-    }
-
-    .popup-container {
-        background-color: #1c1c1e;
-        color: #f5f5f7;
-        padding: 20px;
-        border-radius: 8px;
-        max-width: 400px;
-        width: 90%;
-    }
-
     .popup-container ul {
         list-style: none;
         padding: 0;
@@ -323,13 +289,6 @@ else
 
     .popup-container button {
         margin-top: 16px;
-    }
-
-    /* Miscellaneous */
-    .list-none {
-        list-style: none;
-        padding: 0;
-        margin: 0;
     }
 
     .flex {
@@ -356,29 +315,6 @@ else
     private bool _isAdding = false;
     private bool _isEditing = false;
 
-    private bool _showPersonPopup = false;
-
-    private void ShowPersonPopup()
-    {
-        OpenPersonSelectionDialog();
-    }
-
-    private void SelectPerson(PersonDto person)
-    {
-        _selectedPerson = person;
-        if (_isAdding)
-        {
-            _newPetition.PersonId = _selectedPerson.Id;
-        }
-        else if (_isEditing)
-        {
-            _updatedPetition.PersonId = _selectedPerson.Id;
-        }
-
-        _showPersonPopup = false;
-        StateHasChanged();
-    }
-
     protected override async Task OnInitializedAsync()
     {
         await LoadPetitions();
@@ -395,42 +331,6 @@ else
         _petitions = await Http.GetFromJsonAsync<List<PetitionDto>>("Petitions");
     }
 
-    private async Task OpenPersonSelectionDialog()
-    {
-        var parameters = new DialogParameters
-        {
-            ["Persons"] = _persons ?? new List<PersonDto>(),
-            ["SelectedPerson"] = _selectedPerson
-        };
-
-        var options = new DialogOptions
-        {
-            CloseButton = true,
-            MaxWidth = MaxWidth.Medium,
-            FullWidth = true,
-            DisableBackdropClick = true,
-            Position = DialogPosition.Center
-        };
-
-        var dialog = DialogService.Show<PersonSelectionDialog>("Select Person", parameters, options);
-        var result = await dialog.Result;
-
-        if (!result.Cancelled)
-        {
-            _selectedPerson = (PersonDto)result.Data;
-            if (_isAdding)
-            {
-                _newPetition.PersonId = _selectedPerson.Id;
-            }
-            else if (_isEditing)
-            {
-                _updatedPetition.PersonId = _selectedPerson.Id;
-            }
-
-            StateHasChanged();
-        }
-    }
-
     private void ToggleAddForm()
     {
         _isAdding = !_isAdding;
@@ -443,6 +343,7 @@ else
     {
         await Http.PostAsJsonAsync("Petitions/api/petitions", _newPetition);
         await LoadPetitions();
+        Snackbar.Add("Petition registered successfully!", Severity.Success);
         ToggleAddForm();
     }
 
@@ -466,6 +367,7 @@ else
     private async Task EditPetition()
     {
         await Http.PutAsJsonAsync($"Petitions?id={_updatedPetition.Id}", _updatedPetition);
+        Snackbar.Add("Petition updated successfully!", Severity.Info);
         await LoadPetitions();
         CancelEdit();
     }
@@ -480,6 +382,8 @@ else
     private async Task DeletePetition(int id)
     {
         await Http.DeleteAsync($"Petitions?id={id}");
+        Snackbar.Add("Petition deleted successfully!", Severity.Error);
+
         await LoadPetitions();
     }
 

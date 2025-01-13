@@ -3,6 +3,7 @@
 @using Gender = Common.Gender
 @inject HttpClient Http
 @inject NavigationManager NavigationManager
+@inject ISnackbar Snackbar
 
 <h3 class="text-2xl font-bold mb-4 text-gray-100">Persons</h3>
 
@@ -42,7 +43,7 @@
                                placeholder="XX"
                                @oninput="(e) => _newPerson.PassportSeria = e.Value.ToString().ToUpper()"/>
                 </div>
-                
+
                 <div class="form-group">
                     <label for="passportNumber">Passport Number:</label>
                     <InputText @bind-Value="_newPerson.PassportNumber"
@@ -87,20 +88,18 @@
 
 @if (_persons != null)
 {
-    <div class="overflow-x-auto">
-        <table class="table-auto w-full bg-gray-800 border-collapse border border-gray-700 text-gray-100">
-            <thead>
-            <tr class="bg-gray-900">
-                <th class="border border-gray-700 px-4 py-2">ID</th>
-                <th class="border border-gray-700 px-4 py-2">Full Name</th>
-                <th class="border border-gray-700 px-4 py-2">Phone Number</th>
-                <th class="border border-gray-700 px-5 py-2">Actions</th>
-            </tr>
-            </thead>
-            <tbody>
-            @foreach (var person in _persons)
-            {
-                <tr class="hover:bg-gray-700">
+    <div class="overflow-x-auto ">
+        <PaginationComponent TItem="PersonDto" Items="_persons" DefaultPageSize="5">
+            <ChildContentHeader>
+                <tr class="bg-gray-900">
+                    <th class="border border-gray-700 px-4 py-2">ID</th>
+                    <th class="border border-gray-700 px-4 py-2">Full Name</th>
+                    <th class="border border-gray-700 px-4 py-2">Phone Number</th>
+                    <th class="border border-gray-700 px-5 py-2">Actions</th>
+                </tr>
+            </ChildContentHeader>
+            <ChildContentRow Context="person">
+                <tr class="hover:bg-gray-700 text-white">
                     <td class="border border-gray-700 px-4 py-2">@person.Id</td>
                     <td class="border border-gray-700 px-4 py-2">@person.FullName</td>
                     <td class="border border-gray-700 px-4 py-2">@person.PhoneNumber</td>
@@ -113,9 +112,8 @@
                         </button>
                     </td>
                 </tr>
-            }
-            </tbody>
-        </table>
+            </ChildContentRow>
+        </PaginationComponent>
     </div>
 }
 else
@@ -277,7 +275,6 @@ else
     private PersonDto _newPerson = new();
     private bool _isAdding = false;
     private IBrowserFile? _uploadedPhoto;
-    PaginationState pagination = new PaginationState { ItemsPerPage = 5 };
 
     protected override async Task OnInitializedAsync()
     {
@@ -289,24 +286,27 @@ else
         _persons = await Http.GetFromJsonAsync<List<PersonDto>>("/Persons");
     }
 
-    public void HandleInputChange(ChangeEventArgs e)
+    private void HandleInputChange(ChangeEventArgs e)
     {
         var value = e.Value?.ToString();
         if (!string.IsNullOrEmpty(value))
         {
+            // Оставляем только цифры
             value = new string(value.Where(char.IsDigit).ToArray());
 
-            if (value.Length >= 1)
+            if (value.Length >= 9) // Проверяем, что длина строки достаточна для форматирования
             {
                 var formattedValue = $"+998({value.Substring(0, 2)}){value.Substring(2, 3)}-{value.Substring(5, 2)}-{value.Substring(7, 2)}";
                 _newPerson.PhoneNumber = formattedValue;
             }
             else
             {
+                // Обрабатываем случай, если длина недостаточна для форматирования
                 _newPerson.PhoneNumber = value;
             }
         }
     }
+
 
     private void ToggleAddForm()
     {
@@ -326,9 +326,13 @@ else
 
             await LoadPersons();
         }
+        
+        Snackbar.Add("Petition registered successfully!", Severity.Success);
 
         ToggleAddForm();
     }
+    
+    
 
     private void HandlePhotoUpload(InputFileChangeEventArgs e)
     {
@@ -346,6 +350,8 @@ else
     {
         await Http.DeleteAsync($"/Persons?id={id}");
         await LoadPersons();
+        Snackbar.Add("Petition deleted successfully!", Severity.Error);
     }
 
 }
+

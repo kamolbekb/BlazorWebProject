@@ -3,6 +3,7 @@
 @inherits LayoutComponentBase
 @inject NavigationManager NavigationManager
 @inject HttpClient Http
+@inject ISnackbar Snackbar
 
 <style>
     .container {
@@ -341,20 +342,22 @@
         await LoadDetails(Person.Id);
     }
 
-    public void HandleInputChange(ChangeEventArgs e)
+    private void HandleInputChange(ChangeEventArgs e)
     {
         var value = e.Value?.ToString();
         if (!string.IsNullOrEmpty(value))
         {
+            // Оставляем только цифры
             value = new string(value.Where(char.IsDigit).ToArray());
 
-            if (value.Length >= 1)
+            if (value.Length >= 9) // Проверяем, что длина строки достаточна для форматирования
             {
                 var formattedValue = $"+998({value.Substring(0, 2)}){value.Substring(2, 3)}-{value.Substring(5, 2)}-{value.Substring(7, 2)}";
                 _updatedPerson.PhoneNumber = formattedValue;
             }
             else
             {
+                // Обрабатываем случай, если длина недостаточна для форматирования
                 _updatedPerson.PhoneNumber = value;
             }
         }
@@ -380,6 +383,8 @@
         await Http.PutAsJsonAsync($"/Persons?id={_updatedPerson.Id}", _updatedPerson);
         Person = await Http.GetFromJsonAsync<PersonDto>($"/Persons/GetPersonById?id={Id}");
         await LoadDetails(Person.Id);
+        Snackbar.Add("Petition deleted successfully!", Severity.Info);
+
         CancelEdit();
     }
 
@@ -416,6 +421,8 @@
     {
         await Http.DeleteAsync($"/Photos/DeletePhotoFromPersonAsync?personId={personId}");
         await LoadDetails(person.Id);
+        Snackbar.Add("Petition deleted successfully!", Severity.Error);
+
     }
 
     private async Task AddPhotoToPerson(int personId, IBrowserFile? file)
@@ -436,6 +443,8 @@
             var response = await Http.PostAsync($"/Photos/AddPhotoToPerson{personId}", content);
             response.EnsureSuccessStatusCode();
             await LoadDetails(personId);
+            Snackbar.Add("Petition inserted successfully!", Severity.Success);
+
         }
         catch (HttpRequestException ex)
         {

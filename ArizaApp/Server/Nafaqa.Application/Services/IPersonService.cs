@@ -10,7 +10,9 @@ public interface IPersonService
 {
     Task<CreatePersonResponseModel> CreatePersonAsync(CreatePersonModel createPersonModel);
     Task<PersonResponseModel> GetPersonAsync(int personId);
+
     IEnumerable<PersonResponseModel> GetAllPersons();
+    // Task<IEnumerable<PersonResponseModel>> GetAllPersons(int pageNumber, int elementsPerPage);
     Task<BaseResponseModel<int>> UpdatePersonAsync(int id, UpdatePersonModel updatePersonModel);
     Task<BaseResponseModel<int>> DeletePersonAsync(int id);
 

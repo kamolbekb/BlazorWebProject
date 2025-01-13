@@ -1,13 +1,53 @@
-﻿<div class="alert alert-secondary mt-4">
+﻿<div class="alert alert-primary mt-4">
     <span class="oi oi-pencil me-2" aria-hidden="true"></span>
     <strong>@Title</strong>
 
     <span class="text-nowrap">
         Please take our
-        <a target="_blank" class="font-weight-bold link-dark" href="https://go.microsoft.com/fwlink/?linkid=2186157">brief survey</a>
+        <a target="_blank" class="font-weight-bold link-primary" href="https://go.microsoft.com/fwlink/?linkid=2186157">brief survey</a>
     </span>
     and tell us what you think.
 </div>
+<style>
+    .alert {
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        background-color: #f8f9fa; /* Soft gray background for clarity */
+        color: #333; /* Dark text for better readability */
+        font-size: 16px;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .alert-primary {
+        background-color: #007bff; /* Primary blue */
+        color: white;
+    }
+
+    .alert-primary .link-primary {
+        color: #fff;
+        font-weight: bold;
+        text-decoration: none;
+    }
+
+    .alert-primary .link-primary:hover {
+        color: #e0e0e0; /* Lighter hover effect */
+    }
+
+    .oi {
+        font-size: 1.4em;
+        vertical-align: middle;
+    }
+
+    .text-nowrap {
+        white-space: nowrap;
+    }
+
+    .mt-4 {
+        margin-top: 1.5rem; /* Adds a decent margin to separate components */
+    }
+
+</style>
 
 @code {
 

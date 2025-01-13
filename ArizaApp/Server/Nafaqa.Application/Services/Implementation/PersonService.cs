@@ -1,5 +1,6 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Nafaqa.Application.Models;
 using Nafaqa.Application.Models.Person;
 using Nafaqa.Core.Entities;
@@ -55,9 +56,31 @@ public class PersonService : IPersonService
         var entities = _personRepository
             .SelectAll()
             .OrderBy(x => x.Id);
-
+    
         return _mapper.Map<IEnumerable<PersonResponseModel>>(entities);
     }
+    
+    // public async Task<IEnumerable<PersonResponseModel>> GetAllPersons(int pageNumber, int elementsPerPage)
+    // {
+    //     var skip = (pageNumber - 1) * elementsPerPage;
+    //     var take = elementsPerPage;
+    //
+    //     var entities = await _personRepository.SelectAll()
+    //         .OrderBy(x => x.Id)
+    //         .Skip(skip)
+    //         .Take(take)
+    //         .ToListAsync();
+    //
+    //     if (entities == null || !entities.Any())
+    //     {
+    //         return Enumerable.Empty<PersonResponseModel>();
+    //     }
+    //
+    //
+    //     var responseModels = _mapper.Map<IEnumerable<PersonResponseModel>>(entities);
+    //
+    //     return responseModels.ToList();
+    // }
 
     public async Task<BaseResponseModel<int>> UpdatePersonAsync(int id, UpdatePersonModel updatePersonModel)
     {

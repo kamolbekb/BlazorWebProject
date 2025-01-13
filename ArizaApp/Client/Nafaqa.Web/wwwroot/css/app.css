@@ -228,28 +228,72 @@ h4 {
     }
 }
 
-.dialog-overlay {
+/* Edit form overlay (Second Layer) */
+.form-overlay {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(0, 0, 0, 0.3); /* Slightly dimmed */
     display: flex;
     align-items: center;
     justify-content: center;
+    z-index: 1000; /* Second layer */
 }
 
-.dialog-container {
+.form-container {
     background: white;
+    border-radius: 8px;
+    width: 500px;
     padding: 20px;
-    border-radius: 5px;
-    width: 400px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    position: relative;
 }
 
-.selected-person-info {
-    margin-left: 10px;
-    font-weight: bold;
-    color: #007bff;
+/* Person selection popup (Third Layer) */
+.popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5); /* Dimmed background */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000; /* Higher than form-overlay */
+}
+
+.popup-container {
+    background: white;
+    border-radius: 8px;
+    width: 400px;
+    padding: 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Popup options */
+.popup-options {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.popup-options li {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+    cursor: pointer;
+}
+
+.popup-options li:hover {
+    background-color: #f8f9fa;
+}
+
+/* Popup actions */
+.popup-actions {
+    text-align: right;
+    margin-top: 20px;
 }

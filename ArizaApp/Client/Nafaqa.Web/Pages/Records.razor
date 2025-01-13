@@ -1,25 +1,27 @@
 @page "/petitions"
-@using System.Collections
-@using Common
+@using MudBlazor
 @inject HttpClient Http
+@inject IDialogService DialogService
 
-<h3>Petitions</h3>
+<h3 class="text-2xl font-bold mb-4 text-gray-100">Petitions</h3>
 
-<!-- Button to add a new petition -->
-<button class="btn btn-primary" @onclick="ToggleAddForm">Add New Petition</button>
+<div class="flex justify-end mb-4">
+    <button class="btn btn-primary" @onclick="ToggleAddForm">Add New Petition</button>
+</div>
 
 @if (_isAdding && !_isEditing)
 {
-    <div class="form-overlay">
-        <div class="form-container">
-            <h4>Add New Petition</h4>
+    <div class="overlay fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center">
+        <div class="form-container bg-gray-800 p-6 rounded-lg shadow-lg max-w-3xl w-full mx-auto text-gray-100">
+            <h4 class="text-xl font-semibold mb-4">Add New Petition</h4>
             <EditForm Model="_newPetition" OnValidSubmit="AddPetition">
-                <DataAnnotationsValidator />
-                <ValidationSummary />
+                <DataAnnotationsValidator/>
+                <ValidationSummary class="text-red-500"/>
 
-                <div class="form-group">
-                    <label>Allowance:</label>
-                    <InputSelect @bind-Value="_newPetition.Allowance" class="form-control">
+                <div class="form-group mb-4">
+                    <label class="block font-medium mb-2">Allowance:</label>
+                    <InputSelect @bind-Value="_newPetition.Allowance"
+                                 class="form-control w-full bg-gray-700 text-gray-100">
                         @foreach (var value in Enum.GetValues<AllowanceType>())
                         {
                             <option value="@value">@value</option>
@@ -27,26 +29,30 @@
                     </InputSelect>
                 </div>
 
-                <InputSelect @bind-Value="_newPetition.PersonId" class="form-control">
-                    @if (_persons != null)
-                    {
-                        @foreach (var person in _persons)
+                <div class="form-group mb-4">
+                    <label class="block font-medium mb-2">Person:</label>
+                    <InputSelect @bind-Value="_newPetition.PersonId" class="form-control">
+                        @if (_persons != null)
                         {
-                            <option value="@person.Id">@person.FullName @person.PassportSeria @person.PassportNumber</option>
+                            @foreach (var person in _persons)
+                            {
+                                <option
+                                    value="@person.Id">@person.FullName @person.PassportSeria @person.PassportNumber</option>
+                            }
                         }
-                    }
-                    else
-                    {
-                        <option value="">Loading...</option>
-                    }
-                </InputSelect>
-
-                <div class="form-group">
-                    <label>Letter:</label>
-                    <InputText @bind-Value="_newPetition.Letter" class="form-control" />
+                        else
+                        {
+                            <option value="">Loading...</option>
+                        }
+                    </InputSelect>
                 </div>
 
-                <div class="form-buttons">
+                <div class="form-group mb-4">
+                    <label class="block font-medium mb-2">Letter:</label>
+                    <InputText @bind-Value="_newPetition.Letter" class="form-control w-full bg-gray-700 text-gray-100"/>
+                </div>
+
+                <div class="flex justify-end space-x-2">
                     <button type="submit" class="btn btn-success">Submit</button>
                     <button type="button" class="btn btn-secondary" @onclick="ToggleAddForm">Cancel</button>
                 </div>
@@ -57,16 +63,17 @@
 
 @if (_isEditing)
 {
-    <div class="form-overlay">
-        <div class="form-container">
-            <h4>Edit Petition</h4>
+    <div class="overlay fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center">
+        <div class="form-container bg-gray-800 p-6 rounded-lg shadow-lg max-w-3xl w-full mx-auto text-gray-100">
+            <h4 class="text-xl font-semibold mb-4">Edit Petition</h4>
             <EditForm Model="_updatedPetition" OnValidSubmit="EditPetition">
-                <DataAnnotationsValidator />
-                <ValidationSummary />
+                <DataAnnotationsValidator/>
+                <ValidationSummary class="text-red-500"/>
 
-                <div class="form-group">
-                    <label>Allowance:</label>
-                    <InputSelect @bind-Value="_updatedPetition.Allowance" class="form-control">
+                <div class="form-group mb-4">
+                    <label class="block font-medium mb-2">Allowance:</label>
+                    <InputSelect @bind-Value="_updatedPetition.Allowance"
+                                 class="form-control w-full bg-gray-700 text-gray-100">
                         @foreach (var value in Enum.GetValues<AllowanceType>())
                         {
                             <option value="@value">@value</option>
@@ -74,26 +81,31 @@
                     </InputSelect>
                 </div>
 
-                <InputSelect @bind-Value="_updatedPetition.PersonId" class="form-control">
-                    @if (_persons != null)
-                    {
-                        @foreach (var person in _persons)
+                <div class="form-group mb-4">
+                    <label class="block font-medium mb-2">Person:</label>
+                    <InputSelect @bind-Value="_updatedPetition.PersonId" class="form-control">
+                        @if (_persons != null)
                         {
-                            <option value="@person.Id">@person.FullName @person.PassportSeria @person.PassportNumber</option>
+                            @foreach (var person in _persons)
+                            {
+                                <option
+                                    value="@person.Id">@person.FullName @person.PassportSeria @person.PassportNumber</option>
+                            }
                         }
-                    }
-                    else
-                    {
-                        <option value="">Loading...</option>
-                    }
-                </InputSelect>
-
-                <div class="form-group">
-                    <label>Letter:</label>
-                    <InputText @bind-Value="_updatedPetition.Letter" class="form-control" />
+                        else
+                        {
+                            <option value="">Loading...</option>
+                        }
+                    </InputSelect>
                 </div>
 
-                <div class="form-buttons">
+                <div class="form-group mb-4">
+                    <label class="block font-medium mb-2">Letter:</label>
+                    <InputText @bind-Value="_updatedPetition.Letter"
+                               class="form-control w-full bg-gray-700 text-gray-100"/>
+                </div>
+
+                <div class="flex justify-end space-x-2">
                     <button type="submit" class="btn btn-success">Submit</button>
                     <button type="button" class="btn btn-secondary" @onclick="CancelEdit">Cancel</button>
                 </div>
@@ -104,47 +116,268 @@
 
 @if (_petitions != null)
 {
-    <table class="table table-striped">
-        <thead>
-        <tr>
-            <th>ID</th>
-            <th>Allowance</th>
-            <th>Person ID</th>
-            <th>Letter</th>
-            <th>Application Date</th>
-            <th>Actions</th>
-        </tr>
-        </thead>
-        <tbody>
-        @foreach (var petition in _petitions)
-        {
-            <tr>
-                <td>@petition.Id</td>
-                <td>@petition.Allowance</td>
-                <td>@petition.PersonId</td>
-                <td>@petition.Letter</td>
-                <td>@petition.ApplicationDate.ToShortDateString()</td>
-                <td>
-                    <button class="btn btn-warning" @onclick="() => StartEdit(petition)">Edit</button>
-                    <button class="btn btn-danger" @onclick="() => DeletePetition(petition.Id)">Delete</button>
-                </td>
+    <div class="overflow-x-auto">
+        <table class="table-auto w-full bg-gray-800 border-collapse border border-gray-700 text-gray-100">
+            <thead>
+            <tr class="bg-gray-900">
+                <th class="border border-gray-700 px-4 py-2">ID</th>
+                <th class="border border-gray-700 px-4 py-2">Allowance</th>
+                <th class="border border-gray-700 px-4 py-2">Person</th>
+                <th class="border border-gray-700 px-4 py-2">Passport info</th>
+                <th class="border border-gray-500 px-4 py-2">Letter</th>
+                <th class="border border-gray-700 px-4 py-2">Application Date</th>
+                <th class="border border-gray-700 px-4 py-2">Actions</th>
             </tr>
-        }
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+            @foreach (var petition in _petitions)
+            {
+                <tr class="hover:bg-gray-700">
+                    <td class="border border-gray-700 px-4 py-2">@petition.Id</td>
+                    <td class="border border-gray-700 px-4 py-2">@petition.Allowance</td>
+                    <td class="border border-gray-700 px-4 py-2">@(_persons?.FirstOrDefault(p => p.Id == petition.PersonId)?.FullName ?? "Unknown")</td>
+                    <td class="border border-gray-700 px-4 py-2">@(_persons?.FirstOrDefault(p => p.Id == petition.PersonId)?.PassportSeria ?? "Unknown")
+                        @(_persons?.FirstOrDefault(p => p.Id == petition.PersonId)?.PassportNumber ?? "Unknown")</td>
+                    <td class="border border-gray-700 px-4 py-2">@petition.Letter</td>
+                    <td class="border border-gray-700 px-4 py-2">@petition.ApplicationDate.ToShortDateString()</td>
+                    <td class="border border-gray-700 px-4 py-2">
+                        <button class="btn btn-outline-success material-icons" @onclick="() => StartEdit(petition)">
+                            edit
+                        </button>
+                        <button class="btn btn-outline-danger material-icons"
+                                @onclick="() => DeletePetition(petition.Id)">delete
+                        </button>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
 }
 else
 {
-    <p>Loading...</p>
+    <p class="text-center mt-4 text-gray-100">Loading...</p>
 }
+<style>
+    /* General Reset and Base Styles */
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        background-color: #1c1c1e; /* Dark background */
+        color: #f5f5f7; /* Light text */
+        margin: 0;
+        padding: 0;
+        line-height: 1.6;
+    }
+
+    h3, h4 {
+        color: #f5f5f7; /* Light headings */
+    }
+
+    /* Button Styles */
+    .btn {
+        padding: 10px 16px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background-color 0.3s, color 0.3s;
+    }
+
+    .btn-primary {
+        background-color: #0a84ff; /* Apple blue */
+        color: #fff;
+        border: none;
+    }
+
+    .btn-primary:hover {
+        background-color: #0066cc; /* Darker blue */
+    }
+
+    .btn-secondary {
+        background-color: #3a3a3c; /* Neutral gray */
+        color: #f5f5f7;
+        border: none;
+    }
+
+    .btn-secondary:hover {
+        background-color: #4a4a4c;
+    }
+
+    .btn-outline-primary {
+        border: 1px solid #0a84ff;
+        color: #0a84ff;
+        background-color: transparent;
+    }
+
+    .btn-outline-primary:hover {
+        background-color: #0a84ff;
+        color: #fff;
+    }
+
+    .btn-outline-danger {
+        border: 1px solid #ff453a;
+        color: #ff453a;
+        background-color: transparent;
+    }
+
+    .btn-outline-danger:hover {
+        background-color: #ff453a;
+        color: #fff;
+    }
+
+    /* Form Fields */
+    .form-control {
+        padding: 8px 12px;
+        border-radius: 6px;
+        border: 1px solid #3a3a3c;
+        background-color: #2c2c2e;
+        color: #f5f5f7;
+        font-size: 14px;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: #0a84ff;
+        box-shadow: 0 0 0 2px rgba(10, 132, 255, 0.3);
+    }
+
+    /* Table Styles */
+    .table-auto {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .table-auto th,
+    .table-auto td {
+        padding: 12px;
+        text-align: left;
+        border: 1px solid #3a3a3c;
+    }
+
+    .table-auto th {
+        background-color: #2c2c2e;
+        font-weight: bold;
+        color: #f5f5f7;
+    }
+
+    .table-auto tr:hover {
+        background-color: #3a3a3c;
+    }
+
+    /* Overlay Styles */
+    .overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.75);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+    }
+
+    .form-container {
+        max-width: 600px;
+        background-color: #1c1c1e;
+        padding: 24px;
+        border-radius: 8px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+    }
+
+    .form-container h4 {
+        color: #f5f5f7;
+        margin-bottom: 16px;
+    }
+
+    /* Popup Styles */
+    .popup-overlay {
+        position: fixed;
+        inset: 0;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+    }
+
+    .popup-container {
+        background-color: #1c1c1e;
+        color: #f5f5f7;
+        padding: 20px;
+        border-radius: 8px;
+        max-width: 400px;
+        width: 90%;
+    }
+
+    .popup-container ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .popup-container li {
+        margin-bottom: 10px;
+    }
+
+    .popup-container button {
+        margin-top: 16px;
+    }
+
+    /* Miscellaneous */
+    .list-none {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .flex {
+        display: flex;
+        align-items: center;
+    }
+
+    .justify-end {
+        justify-content: flex-end;
+    }
+
+    .mb-4 {
+        margin-bottom: 16px;
+    }
+
+</style>
 
 @code {
     private List<PetitionDto>? _petitions;
     private PetitionDto _newPetition = new();
     private List<PersonDto>? _persons;
     private PetitionDto _updatedPetition = new();
+    private PersonDto? _selectedPerson;
     private bool _isAdding = false;
     private bool _isEditing = false;
+
+    private bool _showPersonPopup = false;
+
+    private void ShowPersonPopup()
+    {
+        OpenPersonSelectionDialog();
+    }
+
+    private void SelectPerson(PersonDto person)
+    {
+        _selectedPerson = person;
+        if (_isAdding)
+        {
+            _newPetition.PersonId = _selectedPerson.Id;
+        }
+        else if (_isEditing)
+        {
+            _updatedPetition.PersonId = _selectedPerson.Id;
+        }
+
+        _showPersonPopup = false;
+        StateHasChanged();
+    }
 
     protected override async Task OnInitializedAsync()
     {
@@ -156,16 +389,54 @@ else
     {
         _persons = await Http.GetFromJsonAsync<List<PersonDto>>("/Persons");
     }
-    
+
     private async Task LoadPetitions()
     {
         _petitions = await Http.GetFromJsonAsync<List<PetitionDto>>("Petitions");
+    }
+
+    private async Task OpenPersonSelectionDialog()
+    {
+        var parameters = new DialogParameters
+        {
+            ["Persons"] = _persons ?? new List<PersonDto>(),
+            ["SelectedPerson"] = _selectedPerson
+        };
+
+        var options = new DialogOptions
+        {
+            CloseButton = true,
+            MaxWidth = MaxWidth.Medium,
+            FullWidth = true,
+            DisableBackdropClick = true,
+            Position = DialogPosition.Center
+        };
+
+        var dialog = DialogService.Show<PersonSelectionDialog>("Select Person", parameters, options);
+        var result = await dialog.Result;
+
+        if (!result.Cancelled)
+        {
+            _selectedPerson = (PersonDto)result.Data;
+            if (_isAdding)
+            {
+                _newPetition.PersonId = _selectedPerson.Id;
+            }
+            else if (_isEditing)
+            {
+                _updatedPetition.PersonId = _selectedPerson.Id;
+            }
+
+            StateHasChanged();
+        }
     }
 
     private void ToggleAddForm()
     {
         _isAdding = !_isAdding;
         _isEditing = false;
+        _selectedPerson = null;
+        _newPetition = new();
     }
 
     private async Task AddPetition()
@@ -173,11 +444,13 @@ else
         await Http.PostAsJsonAsync("Petitions/api/petitions", _newPetition);
         await LoadPetitions();
         ToggleAddForm();
-        _newPetition = new();
     }
 
     private void StartEdit(PetitionDto petition)
     {
+        _isEditing = true;
+        _isAdding = false;
+
         _updatedPetition = new PetitionDto
         {
             Id = petition.Id,
@@ -186,8 +459,8 @@ else
             Letter = petition.Letter,
             ApplicationDate = petition.ApplicationDate
         };
-        _isEditing = true;
-        _isAdding = false;
+
+        _selectedPerson = _persons?.FirstOrDefault(p => p.Id == petition.PersonId);
     }
 
     private async Task EditPetition()
@@ -201,6 +474,7 @@ else
     {
         _isEditing = false;
         _updatedPetition = new();
+        _selectedPerson = null;
     }
 
     private async Task DeletePetition(int id)
@@ -208,4 +482,6 @@ else
         await Http.DeleteAsync($"Petitions?id={id}");
         await LoadPetitions();
     }
+
 }
+

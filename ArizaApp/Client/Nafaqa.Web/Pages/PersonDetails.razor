@@ -4,88 +4,222 @@
 @inject NavigationManager NavigationManager
 @inject HttpClient Http
 
+<style>
+    .container {
+        background-color: #f9f9f9;
+        color: #333;
+        padding: 40px;
+        border-radius: 10px;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        max-width: 800px;
+        margin: 20px auto;
+    }
+
+    .header {
+        font-size: 28px;
+        color: #2c3e50;
+        margin-bottom: 15px;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .photo-section {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        background-color: #ffffff;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        margin-bottom: 25px;
+        transition: transform 0.2s;
+    }
+
+    .photo-section:hover {
+        transform: translateY(-5px);
+    }
+
+    .photo-actions {
+        display: flex;
+        gap: 12px;
+        margin-top: 12px;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-control {
+        background-color: #f2f2f2;
+        border: 1px solid #ccc;
+        padding: 12px 15px;
+        border-radius: 8px;
+        font-size: 16px;
+        width: 100%;
+        transition: border-color 0.3s;
+    }
+
+    .form-control:focus {
+        border-color: #3498db;
+        outline: none;
+    }
+
+    .btn {
+        background-color: #3498db;
+        color: white;
+        border: none;
+        padding: 12px 16px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 16px;
+        transition: background-color 0.3s ease;
+        display: flex;
+        align-items: center;
+    }
+
+    .btn:hover {
+        background-color: #2980b9;
+    }
+
+    .btn-danger {
+        background-color: #e74c3c;
+    }
+
+    .btn-danger:hover {
+        background-color: #c0392b;
+    }
+
+    .details-container {
+        background-color: #ffffff;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        margin-bottom: 25px;
+
+        display: flex;
+        flex-direction: column;
+        transition: transform 0.2s;
+    }
+
+    .form-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.7);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .form-container {
+        background-color: #ffffff;
+        padding: 40px;
+        border-radius: 12px;
+        width: 450px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 18px;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    th, td {
+        border: 1px solid #ddd;
+        padding: 12px;
+        text-align: center;
+    }
+
+    th {
+        background-color: #f4f4f4;
+        color: #555;
+    }
+
+    tbody tr:hover {
+        background-color: #f1f1f1;
+    }
+</style>
+
+
 @if (Person != null)
 {
-    <div class="details-container">
-        <h4>Details</h4>
-        <div class="d-flex align-items-start gap-3">
+    <div class="container">
+        <h4 class="header">Details</h4>
+        <div class="photo-section">
+            <div class="photo-container" style="display: flex; flex-direction: column; align-items: center; gap: 1rem;">
+                <div style="text-align: center;">
+                    @if (!string.IsNullOrEmpty(_personPhoto))
+                    {
+                        <img src="@_personPhoto" alt="Photo"
+                             style="width: 220px; height: 220px; object-fit: cover; border-radius: 12px;"/>
+                    }
+                    else
+                    {
+                        <p>No Photo Available</p>
+                    }
+                </div>
 
-            <div>
-                @if (!string.IsNullOrEmpty(_personPhoto))
-                {
-                    <img src="@_personPhoto" alt="Photo"
-                         style="width: 150px; height: 150px; object-fit: cover;"/>
-                }
-                else
-                {
-                    <p>No Photo Available</p>
-                }
-            </div>
+                <div class="form-group mb-3" style="text-align: center;">
+                    <label>Upload Photo</label>
+                    <InputFile OnChange="HandlePhotoUpload"/>
+                </div>
 
-            <div>
-                <tr>
-                    <div class="form-group mb-3">
-                        <label>Upload Photo:</label>
-                        <InputFile OnChange="HandlePhotoUpload"/>
-                    </div>
-                </tr>
-                <div class="d-flex gap-2">
+                <div class="photo-actions">
                     <button class="btn btn-danger material-icons" @onclick="() => DeletePhoto(Id, Person)">
                         delete
                     </button>
-                    @* <button type="submit" class="btn btn-success">Set Photo</button> *@
-                    <button class="btn btn-success material-icons"
-                            @onclick="() => AddPhotoToPerson(Id, _uploadedPhoto)">
+                    <button class="btn material-icons" @onclick="() => AddPhotoToPerson(Id, _uploadedPhoto)">
                         upload
                     </button>
-                    <button class="btn btn-success material-icons" @onclick="() => LoadDetails(Person)">
+                    <button class="btn material-icons" @onclick="() => LoadDetails(Person.Id)">
                         refresh
                     </button>
                 </div>
             </div>
         </div>
 
-        <div class="form-group d-flex mt-4">
-            <div class="flex-fill pr-3">
+        <div class="details-container">
+            <div class="form-group">
                 <label>Full name</label>
                 <span class="form-control">@Person.FullName</span>
             </div>
-            <div class="flex-fill px-3">
+            <div class="form-group">
                 <label>Address</label>
                 <span class="form-control">@Person.Address</span>
             </div>
-            <div class="flex-fill pl-3">
+            <div class="form-group">
                 <label>Phone Number</label>
                 <span class="form-control">@Person.PhoneNumber</span>
             </div>
-        </div>
-        <div class="form-group d-flex">
-            <div class="flex-fill pr-3">
+            <div class="form-group">
                 <label>Passport Series</label>
                 <span class="form-control">@Person.PassportSeria</span>
             </div>
-            <div class="flex-fill px-3">
+            <div class="form-group">
                 <label>Passport Number</label>
                 <span class="form-control">@Person.PassportNumber</span>
             </div>
-            <div class="flex-fill pl-3">
+            <div class="form-group">
                 <label>Gender</label>
                 <span class="form-control">@Person.Gender</span>
             </div>
-        </div>
 
-        <div>
-            <tr>
-                <button class="btn btn-success material-icons" @onclick="() => StartEdit(Person)">
+            <div class="">
+                <button class="btn material-icons" @onclick="() => StartEdit(Person)">
                     edit
                 </button>
-            </tr>
+            </div>
         </div>
-        <h4>Petitions</h4>
+
+
+        <h4 class="header">Petitions</h4>
         <ul>
-            @if (_petitions != null && _petitions.Any())
-            {
-                <div class="table-container">
+            <div class="details-container photo-section">
+                @if (_petitions != null && _petitions.Any())
+                {
                     <table class="table table-striped">
                         <thead>
                         <tr>
@@ -105,20 +239,21 @@
                         }
                         </tbody>
                     </table>
-                </div>
-            }
-            else
-            {
-                <li>No Petitions Found</li>
-            }
+                }
+                else
+                {
+                    <li>No Petitions Found</li>
+                }
+            </div>
         </ul>
     </div>
 }
+
 @if (_isEditing)
 {
     <div class="form-overlay">
         <div class="form-container">
-            <h4>Edit Person</h4>
+            <h4 class="header">Edit Person</h4>
             <EditForm Model="_updatedPerson" OnValidSubmit="EditPerson">
                 <DataAnnotationsValidator/>
                 <ValidationSummary/>
@@ -144,8 +279,7 @@
                                class="text-uppercase form-control"
                                maxlength="2"
                                Placeholder="XX"
-                               @oninput="(e) => _updatedPerson.PassportSeria = e.Value
-                                   .ToString().ToUpper()"/>
+                               @oninput="(e) => _updatedPerson.PassportSeria = e.Value.ToString().ToUpper()"/>
                 </div>
 
                 <div class="form-group">
@@ -178,15 +312,13 @@
                 </div>
 
                 <div class="form-buttons">
-                    <button type="submit" class="btn btn-success">Submit</button>
+                    <button type="submit" class="btn">Submit</button>
                     <button type="button" class="btn btn-secondary" @onclick="CancelEdit">Cancel</button>
                 </div>
             </EditForm>
         </div>
     </div>
 }
-
-
 
 @code {
     [Parameter] public int Id { get; set; }
@@ -206,7 +338,7 @@
             throw new ArgumentNullException();
         }
 
-        await LoadDetails(Person);
+        await LoadDetails(Person.Id);
     }
 
     public void HandleInputChange(ChangeEventArgs e)
@@ -214,10 +346,8 @@
         var value = e.Value?.ToString();
         if (!string.IsNullOrEmpty(value))
         {
-            // Remove all non-numeric characters
             value = new string(value.Where(char.IsDigit).ToArray());
 
-            // Apply mask if value length is at least 10
             if (value.Length >= 1)
             {
                 var formattedValue = $"+998({value.Substring(0, 2)}){value.Substring(2, 3)}-{value.Substring(5, 2)}-{value.Substring(7, 2)}";
@@ -249,7 +379,7 @@
     {
         await Http.PutAsJsonAsync($"/Persons?id={_updatedPerson.Id}", _updatedPerson);
         Person = await Http.GetFromJsonAsync<PersonDto>($"/Persons/GetPersonById?id={Id}");
-        await LoadDetails(Person);
+        await LoadDetails(Person.Id);
         CancelEdit();
     }
 
@@ -259,10 +389,10 @@
         _updatedPerson = new();
     }
 
-    private async Task LoadDetails(PersonDto personDto)
+    private async Task LoadDetails(int Id)
     {
-        _petitions = await LoadPetitionsAsync(personDto.Id);
-        _personPhoto = await GetPersonsPhotoAsync(personDto.Id);
+        _petitions = await LoadPetitionsAsync(Id);
+        _personPhoto = await GetPersonsPhotoAsync(Id);
     }
 
     private async Task<string?> GetPersonsPhotoAsync(int personId)
@@ -285,7 +415,7 @@
     private async Task DeletePhoto(int personId, PersonDto? person)
     {
         await Http.DeleteAsync($"/Photos/DeletePhotoFromPersonAsync?personId={personId}");
-        await LoadDetails(person);
+        await LoadDetails(person.Id);
     }
 
     private async Task AddPhotoToPerson(int personId, IBrowserFile? file)
@@ -305,6 +435,7 @@
         {
             var response = await Http.PostAsync($"/Photos/AddPhotoToPerson{personId}", content);
             response.EnsureSuccessStatusCode();
+            await LoadDetails(personId);
         }
         catch (HttpRequestException ex)
         {

@@ -1,7 +1,8 @@
-﻿<Router AppAssembly="@typeof(App).Assembly">
+﻿<MudThemeProvider />
+<Router AppAssembly="@typeof(App).Assembly">
     <Found Context="routeData">
-        <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)"/>
-        <FocusOnNavigate RouteData="@routeData" Selector="h1"/>
+        <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
+        <FocusOnNavigate RouteData="@routeData" Selector="h1" />
     </Found>
     <NotFound>
         <PageTitle>Not found</PageTitle>
@@ -10,3 +11,65 @@
         </LayoutView>
     </NotFound>
 </Router>
+<RouterView />
+
+<style>
+    .Router {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+        background-color: #f9f9f9; /* Light background for a modern look */
+    }
+
+    .RouteView {
+        padding: 20px;
+        background-color: #ffffff;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        margin: 20px;
+        color: #333;
+    }
+
+    .Found {
+        padding: 30px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .NotFound {
+        padding: 50px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        background-color: #f1f1f1;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        text-align: center;
+    }
+
+    .PageTitle {
+        font-size: 24px;
+        margin-bottom: 10px;
+        color: #555;
+    }
+
+    p[role="alert"] {
+        font-size: 16px;
+        color: #777;
+        margin-top: 20px;
+    }
+
+    h1 {
+        font-size: 32px;
+        color: #444;
+        margin-bottom: 20px;
+    }
+
+    .FocusOnNavigate {
+        margin-top: 20px;
+    }
+
+</style>

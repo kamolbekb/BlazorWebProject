@@ -1,5 +1,7 @@
 using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using Nafaqa.Application.Models;
+using Nafaqa.Application.Models.Person;
 using Nafaqa.Application.Services;
 using Nafaqa.Application.Models.Petition;
 using Nafaqa.Core.Entities;
@@ -62,6 +64,29 @@ public class PetitionService : IPetitionService
 
         return _mapper.Map<IEnumerable<PetitionResponseModel>>(entities);
     }
+    // public async Task<IEnumerable<PetitionResponseModel>> GetAllPetitions(int pageNumber, int elementsPerPage)
+    // {
+    //     var skip = (pageNumber - 1) * elementsPerPage;
+    //     var take = elementsPerPage;
+    //
+    //     // Материализация данных
+    //     var entities = await _petitionRepository.SelectAll()
+    //         .OrderBy(x => x.Id)
+    //         .Skip(skip)
+    //         .Take(take)
+    //         .AsNoTracking()
+    //         .ToListAsync();
+    //
+    //     if (entities == null || !entities.Any())
+    //     {
+    //         return Enumerable.Empty<PetitionResponseModel>();
+    //     }
+    //
+    //     // Преобразование данных
+    //     var responseModels = _mapper.Map<IEnumerable<PetitionResponseModel>>(entities);
+    //
+    //     return responseModels;
+    // }
 
     public async Task<BaseResponseModel<int>> UpdatePetitionAsync(int id, UpdatePetitionModel updatePetitionModel)
     {

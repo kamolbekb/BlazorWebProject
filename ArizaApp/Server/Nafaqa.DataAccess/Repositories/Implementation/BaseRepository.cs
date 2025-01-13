@@ -6,9 +6,13 @@ public class BaseRepository<TEntity, TKey> : IBaseRepository<TEntity, TKey>
     where TEntity : class
 {
     private readonly DbContext _appDbContext;
+    protected readonly DbSet<TEntity> DbSet;
 
-    public BaseRepository(DbContext dbContext)=>
+    public BaseRepository(DbContext dbContext)
+    {
         _appDbContext = dbContext;
+        DbSet = dbContext.Set<TEntity>();
+    }
 
     public async ValueTask<TEntity> InsertAsync(
         TEntity entity)
@@ -22,7 +26,7 @@ public class BaseRepository<TEntity, TKey> : IBaseRepository<TEntity, TKey>
     }
 
     public IQueryable<TEntity> SelectAll() =>
-        _appDbContext.Set<TEntity>();
+        DbSet.AsQueryable();
 
     public async ValueTask<TEntity> SelectByIdAsync(int id) =>
         await _appDbContext.Set<TEntity>().FindAsync(id);

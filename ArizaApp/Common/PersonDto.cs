@@ -9,4 +9,5 @@ public class PersonDto{
     public string Address { get; set; }
     public string PhoneNumber { get; set; }
     public PhotoDto PhotoDto { get; set; }
+    public ICollection<PetitionDto> Petitions { get; set; }
 }
